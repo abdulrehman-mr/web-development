@@ -1,6 +1,7 @@
 # 🌐 Web Development Series 🚀
 
 By: [Abdul Rehman](https://www.youtube.com/channel/UC6DRsWYAW0IorsBZx7Jsxdg)
+
 Welcome to the **Web Development Series**! 🎉 In this series, we will be covering everything you need to become a full-stack web developer. You'll learn both frontend and backend technologies, as well as some modern frameworks for building dynamic websites.
 
 ## 🗂️ Table of Contents
@@ -43,6 +44,15 @@ Welcome to the ultimate web development course! In this series, we will guide yo
 | 01         | Introduction to HTML | Basic HTML structure, tags, and elements          |
 | 02         | CSS Basics           | Styling elements, colors, fonts, and layout       |
 | 03         | JavaScript Basics    | Variables, functions, loops, and conditionals     |
+
+### Tutorials & Projects
+
+| No. | Topic                                             |   Link   |
+|-----|---------------------------------------------------|----------|
+| 01  | Upload & Deploy Local HTML Website Project Online | [Watch](https://youtu.be/9DQI6PTmDJQ) |
+| 02  | Maximize Website Speed to Score 100 on PageSpeed  | [Watch](https://youtu.be/Dieb_VIeVYU) |
+| 03  | Spotify Clone with CSS, PHP, and JavaScript       | [Watch](https://youtu.be/3ru2u1y_SHc) |
+| 04  | Deploy Website on VPS Server Using Lvato.com      | [Watch](https://youtu.be/8ot51o0FmHg) |
 
 ---
 
