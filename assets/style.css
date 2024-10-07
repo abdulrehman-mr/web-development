@@ -1,0 +1,239 @@
+/* Style for the div*/
+@import url('https://fonts.googleapis.com/css2?family=Jacquarda+Bastarda+9&family=Roboto:ital,wght@0,100;0,300;0,400;0,500;0,700;0,900;1,100;1,300;1,400;1,500;1,700;1,900&display=swap');
+
+*{
+    box-sizing: border-box;
+    margin: 0;
+    font-family: sans-serif;
+}
+
+body{
+}
+h1{
+    color: rgba(110, 0, 0, 0.116);
+
+}
+.green{
+    color: #00ff22;
+    display: none;
+}
+
+.green{
+    color: #00ff22 !important;
+}
+p:first-child {
+    color: #6200ff !important;
+    opacity: 0.4;
+}
+/* #ptag {
+
+    margin:40px 20px 10px 0px;
+    margin-top: auto;
+    margin-left: auto;
+    padding: 20px 10px;
+    padding-left:  0px;
+    /*height width*/
+    /* height: 600px;
+    max-height: auto;
+    min-height: auto;
+    width: 80%;
+    max-width: auto;
+    min-width: auto; */
+    /*text*/
+    /* color: #fff;
+    text-align: justify;
+    text-decoration:none;
+    text-transform: lowercase;
+    letter-spacing: 10px;
+    line-height: 1.5rem; */
+    /* text-shadow: 2px 0px blue; */
+    /* font-family: "Jacquarda Bastarda 9", serif;
+    font-weight: 400;
+    font-style: normal;
+    font-size: calc(2vw - 10px); */
+/* } */
+.background {
+    background: linear-gradient(0deg, #f00e0ec7, #fa1f1fc7), url('horse.jpeg');
+    background-position: center left;
+    background-size: cover;
+    background-repeat: no-repeat;
+
+}
+
+.border{
+    /* Length measure: rem vw vh px*/
+    border: 22px solid #000;
+    border-radius: 10px 50px 50px 50px;
+}
+.bordergreen{
+    /* Length measure: rem vw vh px*/
+    border-color: #00ff22;
+}
+a{
+    text-decoration: none;
+    padding: 10px 20px;
+    background-color: #000;
+    color: #00ff22;
+    display: inline-block;
+    margin: 20px;
+    border: 2px solid #00ff22;
+    border-radius: 20px;
+}
+a.btn:hover{
+    background-color:  #00ff22;
+    color: #000;
+    border-color: #000;
+    cursor:progress;
+}
+ul{
+    list-style: none;
+}
+ul li {
+    display: inline-block;
+    padding: 10px
+}
+ul li a{
+    text-decoration: none;
+    padding: 10px 20px;
+    background-color: #000;
+    color: #00e1ff;
+    display: inline-block;
+    margin: 20px;
+    border: 2px solid #1f28a7;
+    border-radius: 20px;
+}
+
+table{
+    width: 30%;
+    margin: 10px;
+    min-width:900px
+}
+table tr{
+    margin: 10px;
+    padding: 10px;
+    border:3px solid #c91e1e
+}
+table th{
+    margin: 10px;
+    padding: 30px;
+    border:3px solid #c91e1e
+}
+table  td{
+    margin: 10px;
+    padding: 30px;
+    border:3px solid #c91e1e
+}
+
+.flexbox{
+    display: flex;
+    flex-wrap: wrap;
+    flex-direction: row;
+    justify-content: center;
+    align-items: center;
+    align-content: center;
+    height: 100vh;
+}
+.flexbox .col{
+    width: 30%;
+    background-color: #eede00;
+    height: 300px;
+    display: flex;
+    align-items: center;
+}
+.postions{
+    /* z-index: 1;
+    top:0;
+    left: 0;
+    width: 2020px;
+    height: 400px;
+    overflow: hidden;
+    background-color: #000;
+   
+    border-radius: 40px;
+    border:20px solid rgba(179, 6, 6, 0.993); 
+    display: block; */
+} 
+.postions2{
+    position: fixed;
+    z-index: 2;
+    top:0;
+    left: 0;
+}
+/* CSS Combinators */
+/* 
+.div1 +  p{
+ background-color: #00ff22;
+}
+/* General Sibling Selector (~) */
+/* .div2 ~ p{
+    background-color: #00ff22;
+} */
+
+form{
+    background-color: #00DBDE;
+    background-image: linear-gradient(90deg, #00DBDE 0%, #FC00FF 100%);
+    
+    
+}
+form input[type="text"], form input[type="email"],form textarea, form button{
+    background: #00ccff;
+    padding: 10px 30px;
+    border-radius: 10px;
+    border: 1px solid #000;
+    display: block;
+}
+form button[type="submit"]{
+    text-decoration: none;
+    padding: 10px 20px;
+    background-color: #000;
+    color: #00e1ff;
+    display: inline-block;
+    margin: 20px;
+    border: 2px solid #1f28a7;
+    border-radius: 20px;
+    transition: ease 800ms;
+    animation-name: bgchage;
+    animation-duration: 3s;
+    animation-iteration-count: 3;
+}
+@keyframes bgchage {
+    0%   {background-color:red; left:0px; top:0px;}
+    12%  {background-color:yellow; left:200px; top:0px;}
+    15%  {background-color:white; left:200px; top:0px;}
+    17%  {background-color:black; left:200px; top:0px;}
+    50%  {background-color:blue; left:200px; top:200px;}
+    75%  {background-color:green; left:0px; top:200px;}
+    100% {background-color:red; left:0px; top:0px;}
+}
+form button[type="submit"]:hover{
+    box-shadow: 0px 0px 18px 1px #2600ff;
+    transform: skew(10deg);
+}
+@media screen and (max-width:1000px){
+    h1{
+        font-size: 120px;
+    }
+    form input[type="text"], form input[type="email"],form textarea, form button{
+    
+        font-size: 40px;
+    }
+    table {
+        min-width: auto;
+    }
+    .flexbox {
+        flex-direction: column;
+    }
+    .flexbox .col{
+        width: 100%;
+        height: auto;
+    }
+}
+@media print {
+    form,img,a,p,ul,ol {
+ display: none;
+    }
+    table {
+        min-width: 90%;
+    }
+
+}

@@ -4,16 +4,26 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>My Website</title>
-    <link rel="stylesheet" href="assets/style.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Jacquarda+Bastarda+9&family=Roboto:ital,wght@0,100;0,300;0,400;0,500;0,700;0,900;1,100;1,300;1,400;1,500;1,700;1,900&display=swap" rel="stylesheet">
+        
+    <link rel="stylesheet" href="assets/style.css?v=1">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.6.0/css/all.min.css" integrity="sha512-Kc323vGBEqzTmouAECnVceyQqyqdsSiqLQISBL29aUW4U/M7pSPA/gEUZQqv1cwx4OnYxTxve5UMg5GT6L4JJg==" crossorigin="anonymous" referrerpolicy="no-referrer" />
 </head>
 <body>
     <div> 
         <marquee behavior="" direction="">SALE 50% OFF</marquee>
-        <h1 align="center" style="">
-        &#9730; Learn Html Now!
+        <h1 align="center" style="color:#ffd900; background: #af0000;">
+        &#9730; Learn CSS Now!
         </h1>
-        <p id="ptag">
-            Lorem ipsum dolor sit, amet <small>consectetur</small> <b>adipisicing</b> <em>elit</em>.
+        <h1 class="green" align="center" style="">
+            <svg xmlns="https://www.w3.org/2000/svg" style="height: 55px; width: auto;" fill="currentColor" class="bi bi-amd" viewBox="0 0 16 16">
+                <path d="m.334 0 4.358 4.359h7.15v7.15l4.358 4.358V0zM.2 9.72l4.487-4.488v6.281h6.28L6.48 16H.2z"/>
+              </svg> This Is H1 2ND
+            </h1>
+        <p id="ptag" class="background border bordergreen">
+            <i class="fa-solid fa-palette"></i> Lorem ipsum dolor sit, amet <small>consectetur</small> <b>adipisicing</b> <em>elit</em>.
             </br> Aliquid, velit nihil. Ipsam doloribus earum, adipisci illo commodi saepe totam iusto exercitationem ipsum quas laudantium dolorem dicta eum ea eos quasi.
         </p>
         <img src="assets/horse.jpeg" alt="" srcset="" style="width: 200px;"></br>
@@ -25,7 +35,8 @@
     <!-- TABLE block -->
     <div>
         <h2>TABLE OF BOOKS</h2>
-        <table border="1">
+        <div style="overflow-x:auto;">
+           <table border="1">
             <thead>
                 <tr>
                     <th># Number</th>
@@ -72,15 +83,17 @@
                     </td>
                 </tr>
             </tbody>
-        </table>
+        </table> 
+        </div>
+        
     </div>
     <!-- LIST blocks -->
     <div>
-        <ul  style="list-style: none; display: inline-block;">
-            <li style="display: inline-block;"><a href="#ptag">Go to p Tag</a></li>
-            <li style="display: inline-block;">Hello I am List Item 2</li>
-            <li style="display: inline-block;">Hello I am List Item 3</li>
-            <li style="display: inline-block;">Hello I am List Item 4</li>
+        <ul  >
+            <li style=""><a href="#ptag">Go to p Tag</a></li>
+            <li style="">Hello I am List Item 2</li>
+            <li style="">Hello I am List Item 3</li>
+            <li style="">Hello I am List Item 4</li>
         </ul>
         <ol style="list-style: none;">
             <li>Hello I am List Item 1</li>
@@ -132,7 +145,7 @@
     <textarea>
     -->
 
-    <form method="get" enctype="multipart/form-data">
+    <form method="get" enctype="multipart/form-data" class="postions">
         <label for="">Name:</label>
         <input type="text" name="fullname" readonly value="Ali">
         </br>
@@ -173,11 +186,21 @@
         <textarea style="width: 400px; height: 500px;" name="message" ></textarea>
         <button type="submit">Submit form</button>
     </form>
-
-    <!-- HTML Entites-->
+<div class="postions2">
+        <!-- HTML Entites-->
     &lt;p&gt;
 
     &#9730;
+</div>
 
+<div class="div1">
+    <!-- <p>Lorem ipsum dolor sit amet consectetur adipisicing elit. Perferendis, vero. Voluptatum quasi ea fuga aspernatur quae itaque molestiae earum atque. Molestias eos aliquam excepturi quaerat labore temporibus iure architecto magni.</p> -->
+</div>
+<p>Lorem ipsum dolor sit amet consectetur adipisicing elit. Perferendis, vero. Voluptatum quasi ea fuga aspernatur quae itaque molestiae earum atque. Molestias eos aliquam excepturi quaerat labore temporibus iure architecto magni.</p>
+<p>Lorem ipsum dolor sit amet consectetur adipisicing elit. Perferendis, vero. Voluptatum quasi ea fuga aspernatur quae itaque molestiae earum atque. Molestias eos aliquam excepturi quaerat labore temporibus iure architecto magni.</p>
+<p>Lorem ipsum dolor sit amet consectetur adipisicing elit. Perferendis, vero. Voluptatum quasi ea fuga aspernatur quae itaque molestiae earum atque. Molestias eos aliquam excepturi quaerat labore temporibus iure architecto magni.</p>
+<div class="div1">
+    <p>Lorem ipsum dolor sit amet consectetur adipisicing elit. Perferendis, vero. Voluptatum quasi ea fuga aspernatur quae itaque molestiae earum atque. Molestias eos aliquam excepturi quaerat labore temporibus iure architecto magni.</p>
+</div>
 </body>
 </html>
