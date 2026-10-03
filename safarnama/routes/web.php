@@ -38,6 +38,11 @@ Route::prefix('admin')->name('admin.')->middleware('auth')->group(function () {
     Route::resource('faqs', Admin\FaqController::class)->except('show');
     Route::resource('bookings', Admin\BookingController::class)->only(['index', 'show', 'update', 'destroy']);
     Route::resource('inquiries', Admin\InquiryController::class)->only(['index', 'show', 'destroy']);
+    Route::get('media', [Admin\MediaController::class, 'index'])->name('media.index');
+    Route::post('media', [Admin\MediaController::class, 'store'])->name('media.store');
+    Route::post('media/scan', [Admin\MediaController::class, 'scan'])->name('media.scan');
+    Route::post('media/import', [Admin\MediaController::class, 'import'])->name('media.import');
+    Route::delete('media/{medium}', [Admin\MediaController::class, 'destroy'])->name('media.destroy');
     Route::get('settings', [Admin\SettingController::class, 'edit'])->name('settings.edit');
     Route::put('settings', [Admin\SettingController::class, 'update'])->name('settings.update');
 });

@@ -30,13 +30,13 @@
             <x-admin.card title="Day-by-day itinerary" description="Add each day, and choose where guests sleep that night." x-data="{ days: {{ Js::from($days) }} }">
                 <ol class="space-y-3">
                     <template x-for="(day, i) in days" :key="i">
-                        <li class="rounded-2xl bg-marble-50 p-4 ring-1 ring-marble-200">
+                        <li class="rounded-2xl bg-white p-4 ring-1 ring-slate-200">
                             <div class="mb-3 flex items-center justify-between gap-2">
-                                <span class="rounded-full bg-pine-800 px-3 py-1 text-xs font-semibold text-marble-50" x-text="'Day ' + (i + 1)"></span>
+                                <span class="rounded-full bg-brand-800 px-3 py-1 text-xs font-semibold text-white" x-text="'Day ' + (i + 1)"></span>
                                 <div class="flex gap-1 text-ink/50">
-                                    <button type="button" class="rounded-lg p-1.5 hover:bg-marble-200 disabled:opacity-30" :disabled="i === 0" @click="[days[i - 1], days[i]] = [days[i], days[i - 1]]" aria-label="Move up">↑</button>
-                                    <button type="button" class="rounded-lg p-1.5 hover:bg-marble-200 disabled:opacity-30" :disabled="i === days.length - 1" @click="[days[i + 1], days[i]] = [days[i], days[i + 1]]" aria-label="Move down">↓</button>
-                                    <button type="button" class="rounded-lg p-1.5 text-sandstone-600 hover:bg-sandstone-500/10" @click="days.splice(i, 1)" aria-label="Remove day"><x-icon name="trash" class="size-4"/></button>
+                                    <button type="button" class="rounded-lg p-1.5 hover:bg-slate-200 disabled:opacity-30" :disabled="i === 0" @click="[days[i - 1], days[i]] = [days[i], days[i - 1]]" aria-label="Move up">↑</button>
+                                    <button type="button" class="rounded-lg p-1.5 hover:bg-slate-200 disabled:opacity-30" :disabled="i === days.length - 1" @click="[days[i + 1], days[i]] = [days[i], days[i + 1]]" aria-label="Move down">↓</button>
+                                    <button type="button" class="rounded-lg p-1.5 text-rose-600 hover:bg-rose-500/10" @click="days.splice(i, 1)" aria-label="Remove day"><x-icon name="trash" class="size-4"/></button>
                                 </div>
                             </div>
                             <div class="grid gap-3 sm:grid-cols-2">
@@ -53,7 +53,7 @@
                         </li>
                     </template>
                 </ol>
-                <p x-show="!days.length" class="rounded-2xl border border-dashed border-marble-300 p-6 text-center text-sm text-ink/50">No days yet.</p>
+                <p x-show="!days.length" class="rounded-2xl border border-dashed border-slate-300 p-6 text-center text-sm text-ink/50">No days yet.</p>
                 <button type="button" @click="days.push({ title: '', description: '', meals: '', hotel_id: '' })" class="btn btn-ghost mt-4 w-full py-2.5"><x-icon name="plus" class="size-4"/>Add day</button>
             </x-admin.card>
 
@@ -69,7 +69,7 @@
                 <x-admin.image name="hero_image" label="Main photo" :value="$package->hero_image" help="Wide landscape, at least 2000px."/>
                 <div class="mt-6">
                     <x-admin.textarea name="gallery" label="Gallery image URLs / paths (one per line)" :value="$lines('gallery')" rows="4"/>
-                    <label class="mt-2 flex cursor-pointer items-center justify-center gap-2 rounded-xl border border-dashed border-marble-300 bg-marble-50 px-4 py-3 text-sm text-ink/60 hover:border-pine-600" x-data="{ n: 0 }">
+                    <label class="mt-2 flex cursor-pointer items-center justify-center gap-2 rounded-xl border border-dashed border-slate-300 bg-white px-4 py-3 text-sm text-ink/60 hover:border-brand-600" x-data="{ n: 0 }">
                         <x-icon name="plus" class="size-4"/><span x-text="n ? n + ' photo(s) selected' : 'Upload gallery photos'"></span>
                         <input type="file" name="gallery_files[]" accept="image/*" multiple class="sr-only" @change="n = $event.target.files.length">
                     </label>
@@ -119,8 +119,8 @@
             <x-admin.card title="Destinations visited">
                 <div class="max-h-72 space-y-1 overflow-y-auto">
                     @foreach ($destinations as $d)
-                        <label class="flex cursor-pointer items-center gap-3 rounded-lg px-2 py-1.5 text-sm hover:bg-marble-50">
-                            <input type="checkbox" name="destination_ids[]" value="{{ $d->id }}" @checked(in_array($d->id, $selectedDestinations, true)) class="size-4 rounded accent-pine-700">
+                        <label class="flex cursor-pointer items-center gap-3 rounded-lg px-2 py-1.5 text-sm hover:bg-white">
+                            <input type="checkbox" name="destination_ids[]" value="{{ $d->id }}" @checked(in_array($d->id, $selectedDestinations, true)) class="size-4 rounded accent-brand-700">
                             {{ $d->name }} <span class="ml-auto text-xs text-ink/40">{{ $d->region }}</span>
                         </label>
                     @endforeach

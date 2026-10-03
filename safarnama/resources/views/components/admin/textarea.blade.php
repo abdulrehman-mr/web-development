@@ -4,5 +4,5 @@
     <label for="{{ $id }}" class="label">{{ $label }}</label>
     <textarea id="{{ $id }}" name="{{ $name }}" rows="{{ $rows }}" {{ $attributes->except('class')->merge(['class' => 'field']) }}>{{ old($name, $value) }}</textarea>
     @if ($help)<p class="mt-1 text-xs text-ink/50">{{ $help }}</p>@endif
-    @error($name)<p class="mt-1 text-xs text-sandstone-600">{{ $message }}</p>@enderror
+    @error($name)<p class="mt-1 text-xs text-rose-600">{{ $message }}</p>@enderror
 </div>

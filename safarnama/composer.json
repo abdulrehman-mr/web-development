@@ -43,7 +43,8 @@
             "@php -r \"file_exists('.env') || copy('.env.example', '.env');\"",
             "@php artisan key:generate",
             "@php artisan migrate --force",
-            "npm install --ignore-scripts",
+            "@php artisan storage:link --quiet",
+            "npm install",
             "npm run build"
         ],
         "dev": [
@@ -71,6 +72,9 @@
         ],
         "pre-package-uninstall": [
             "Illuminate\\Foundation\\ComposerScripts::prePackageUninstall"
+        ],
+        "images:import": [
+            "@php artisan images:import"
         ]
     },
     "extra": {

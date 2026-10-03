@@ -4,5 +4,5 @@
     <label for="{{ $id }}" class="label">{{ $label }}</label>
     <input id="{{ $id }}" type="{{ $type }}" name="{{ $name }}" value="{{ old($name, $value) }}" {{ $attributes->except('class')->merge(['class' => 'field']) }}>
     @if ($help)<p class="mt-1 text-xs text-ink/50">{{ $help }}</p>@endif
-    @error($name)<p class="mt-1 text-xs text-sandstone-600">{{ $message }}</p>@enderror
+    @error($name)<p class="mt-1 text-xs text-rose-600">{{ $message }}</p>@enderror
 </div>

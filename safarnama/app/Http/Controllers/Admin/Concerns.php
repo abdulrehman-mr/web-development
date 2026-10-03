@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers\Admin;
 
+use App\Models\MediaAsset;
 use Illuminate\Http\Request;
 use Illuminate\Support\Str;
 
@@ -17,7 +18,14 @@ trait Concerns
             return $request->file($field.'_file')->store('uploads', 'public');
         }
 
-        return $request->has($field) ? $request->input($field) : $current;
+        $value = $request->has($field) ? $request->input($field) : $current;
+
+        // Remote images are added to the media library so they can be imported locally.
+        if (MediaAsset::isRemote($value)) {
+            MediaAsset::register($value);
+        }
+
+        return $value;
     }
 
     protected function imageRules(string $field): array

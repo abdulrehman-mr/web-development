@@ -57,18 +57,41 @@ Run the tests with `php artisan test`.
 
 ## Brand
 
-| Token | Hex | Where it comes from |
+The site uses a cool, crisp palette in the style of modern travel products such as Airbnb, Booking and the Tailwind travel templates. It deliberately avoids the cream, brown and gold look that reads as AI-generated.
+
+| Token | Hex | Use |
 |---|---|---|
-| Pine 900 | `#0e2c25` | The green of the national flag and the Shalimar Gardens |
-| Brass 400 | `#d3a955` | Gilded Mughal metalwork and truck-art trim |
-| Marble 50 | `#fbf9f4` | The white marble of the Badshahi Mosque domes |
-| Sandstone 500 | `#a5452f` | The red sandstone of Lahore Fort (used sparingly) |
+| Brand 900 | `#01411C` | The official Pakistan flag green, used for the footer and featured sections |
+| Brand 700 | `#097045` | Buttons and links |
+| Lake 300 / 700 | `#67E4F6` / `#0E6F89` | Attabad Lake turquoise, used sparingly for highlights on dark backgrounds |
+| Slate | Tailwind's `slate` | Text, borders and surfaces, on a white background |
 
-- **Typography:** Cormorant Garamond for display text and Manrope for body text.
-- **Signature motif:** a pointed Mughal arch frames the photos (the `.arch` class), with a subtle jali lattice pattern behind them.
+- **Typography:** Plus Jakarta Sans for everything, with headings set extra-bold and tightly spaced.
+- **Signature shape:** a pointed Mughal arch (the `.arch` class) appears only on the home page hero and the destination tiles.
 
-## Content and images
+## Images: importing them to your server
+
+Content can reference images by URL, for example Wikimedia Commons, Unsplash or your old website. The **image importer** copies those images into `storage/app/public/media` and switches the content to the local copies. After that, the live site no longer depends on another website.
+
+It runs in three ways:
+
+1. **Automatically on deploy.** `npm install` runs `scripts/import-images.mjs` as a `postinstall` step, which calls `php artisan images:import`. The step skips itself if Laravel isn't installed yet and never fails the install. Set `SKIP_IMAGE_IMPORT=1` to turn it off.
+2. **From the command line.**
+   ```bash
+   php artisan images:import                 # download new and missing images, then use the local copies
+   php artisan images:import --retry-failed  # also retry earlier failures
+   php artisan images:import --limit=10      # download in smaller batches
+   ```
+3. **From the admin panel.** Go to **Admin → Media library**:
+   - paste image URLs, one per line
+   - click **Import now** to download them in small batches with a progress bar
+   - click **Retry failed** to try again
+   - click **Copy local path** to use an imported image in any image field
+
+Every remote URL you save in an admin form is added to the library automatically. The library keeps each image's original URL, so if a file goes missing on the server, for example after a fresh deploy, the next import downloads it again. Run `php artisan storage:link` once on each server so `/storage/media/...` is publicly reachable.
+
+## Content
 
 The seed data includes six journeys, fourteen destinations, thirteen stays, reviews and FAQs. All of it is sample content and can be edited in the admin panel. Hotel names, phone numbers and statistics are placeholders, so check them before you launch.
 
-Seed images point at Wikimedia Commons file names. **Replace them with your own photography** by uploading photos in the admin panel. Every image sits on a branded fallback, so a missing photo never shows as a broken image.
+Seed photos point at real Wikimedia Commons files (CC BY-SA licensed, so credit the photographers if you keep them). Replace them with your own photography when you can. Every photo sits on a branded fallback, so a missing image never shows as broken.

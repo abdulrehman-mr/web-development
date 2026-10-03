@@ -23,13 +23,13 @@
 
             <x-admin.card title="Trip">
                 <dl class="grid gap-4 text-sm sm:grid-cols-3">
-                    <div class="sm:col-span-3"><dt class="text-xs text-ink/50">Journey</dt><dd class="mt-0.5 font-medium">@if($booking->package)<a href="{{ route('admin.packages.edit', $booking->package) }}" class="text-pine-800 hover:underline">{{ $booking->package->title }}</a>@else — @endif</dd></div>
+                    <div class="sm:col-span-3"><dt class="text-xs text-ink/50">Journey</dt><dd class="mt-0.5 font-medium">@if($booking->package)<a href="{{ route('admin.packages.edit', $booking->package) }}" class="text-brand-800 hover:underline">{{ $booking->package->title }}</a>@else — @endif</dd></div>
                     <div><dt class="text-xs text-ink/50">Start date</dt><dd class="mt-0.5 font-medium">{{ $booking->start_date?->format('l, j F Y') }}</dd></div>
                     <div><dt class="text-xs text-ink/50">Travellers</dt><dd class="mt-0.5 font-medium">{{ $booking->adults }} adults, {{ $booking->children }} children</dd></div>
                     <div><dt class="text-xs text-ink/50">Rooms</dt><dd class="mt-0.5 font-medium">{{ $booking->room_preference ?: '—' }}</dd></div>
                 </dl>
                 @if ($booking->special_requests)
-                    <div class="mt-5 rounded-xl bg-marble-50 p-4 text-sm"><p class="mb-1 text-xs text-ink/50">Special requests</p><p class="whitespace-pre-line">{{ $booking->special_requests }}</p></div>
+                    <div class="mt-5 rounded-xl bg-white p-4 text-sm"><p class="mb-1 text-xs text-ink/50">Special requests</p><p class="whitespace-pre-line">{{ $booking->special_requests }}</p></div>
                 @endif
             </x-admin.card>
         </div>
@@ -44,7 +44,7 @@
                             @foreach (\App\Models\Booking::STATUSES as $s)
                                 <label class="cursor-pointer">
                                     <input type="radio" name="status" value="{{ $s }}" @checked($booking->status === $s) class="peer sr-only">
-                                    <span class="block rounded-xl px-3 py-2 text-center text-sm capitalize ring-1 ring-marble-300 peer-checked:bg-pine-800 peer-checked:text-marble-50 peer-checked:ring-pine-800">{{ $s }}</span>
+                                    <span class="block rounded-xl px-3 py-2 text-center text-sm capitalize ring-1 ring-slate-300 peer-checked:bg-brand-800 peer-checked:text-white peer-checked:ring-brand-800">{{ $s }}</span>
                                 </label>
                             @endforeach
                         </div>

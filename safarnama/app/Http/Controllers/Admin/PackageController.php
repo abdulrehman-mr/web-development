@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Models\Category;
 use App\Models\Destination;
 use App\Models\Hotel;
+use App\Models\MediaAsset;
 use App\Models\Package;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
@@ -100,6 +101,7 @@ class PackageController extends Controller
         foreach ($request->file('gallery_files', []) as $file) {
             $gallery[] = $file->store('uploads', 'public');
         }
+        collect($gallery)->filter(fn ($g) => MediaAsset::isRemote($g))->each(fn ($g) => MediaAsset::register($g));
 
         $package->fill([
             'title' => $data['title'],

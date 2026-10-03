@@ -3,6 +3,7 @@
 namespace Database\Seeders;
 
 use App\Models\User;
+use App\Support\ImageImporter;
 use Illuminate\Database\Seeder;
 
 class DatabaseSeeder extends Seeder
@@ -18,5 +19,9 @@ class DatabaseSeeder extends Seeder
             SettingSeeder::class,
             TravelSeeder::class,
         ]);
+
+        // Register remote images so they show up in Admin → Media library.
+        // Downloading happens in `php artisan images:import` / `npm install`.
+        app(ImageImporter::class)->scan();
     }
 }

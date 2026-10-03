@@ -8,13 +8,13 @@
         </x-media>
         <div class="flex-1 space-y-2">
             <input type="text" name="{{ $name }}" x-model="url" @input="preview = url" placeholder="Paste an image URL…" class="field">
-            <label class="flex cursor-pointer items-center justify-center gap-2 rounded-xl border border-dashed border-marble-300 bg-marble-50 px-4 py-3 text-sm text-ink/60 transition hover:border-pine-600 hover:text-pine-800">
+            <label class="flex cursor-pointer items-center justify-center gap-2 rounded-xl border border-dashed border-slate-300 bg-white px-4 py-3 text-sm text-ink/60 transition hover:border-brand-600 hover:text-brand-800">
                 <x-icon name="plus" class="size-4"/> <span>…or upload a photo</span>
                 <input type="file" name="{{ $name }}_file" accept="image/*" class="sr-only" @change="if ($event.target.files[0]) { preview = URL.createObjectURL($event.target.files[0]); }">
             </label>
             @if ($help)<p class="text-xs text-ink/50">{{ $help }}</p>@endif
-            @error($name)<p class="text-xs text-sandstone-600">{{ $message }}</p>@enderror
-            @error($name.'_file')<p class="text-xs text-sandstone-600">{{ $message }}</p>@enderror
+            @error($name)<p class="text-xs text-rose-600">{{ $message }}</p>@enderror
+            @error($name.'_file')<p class="text-xs text-rose-600">{{ $message }}</p>@enderror
         </div>
     </div>
 </div>

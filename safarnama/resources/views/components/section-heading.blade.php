@@ -1,10 +1,10 @@
 @props(['eyebrow' => null, 'title', 'intro' => null, 'light' => false, 'center' => false])
 <div {{ $attributes->class(['max-w-2xl', 'mx-auto text-center' => $center]) }} data-reveal>
     @if ($eyebrow)
-        <p @class(['eyebrow mb-3', 'text-brass-300' => $light])>{{ $eyebrow }}</p>
+        <p @class(['mb-2 text-sm font-semibold', $light ? 'text-lake-300' : 'text-brand-700'])>{{ $eyebrow }}</p>
     @endif
-    <h2 @class(['heading-lg', $light ? 'text-marble-50' : 'text-pine-950'])>{{ $title }}</h2>
+    <h2 @class(['heading-lg text-balance', $light ? 'text-white' : 'text-slate-900'])>{{ $title }}</h2>
     @if ($intro)
-        <p @class(['mt-4 text-base leading-relaxed sm:text-lg', $light ? 'text-marble-50/70' : 'text-ink/65'])>{{ $intro }}</p>
+        <p @class(['mt-3 text-base leading-relaxed sm:text-lg', $light ? 'text-white/75' : 'text-slate-600'])>{{ $intro }}</p>
     @endif
 </div>

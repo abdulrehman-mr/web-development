@@ -13,14 +13,15 @@ use Illuminate\Support\Str;
 
 /**
  * Sample content so the site looks complete on first run.
- * Everything here is editable from the admin panel; images point at
- * Wikimedia Commons and should be replaced with your own photography.
+ * Everything here is editable from the admin panel. Images point at verified
+ * Wikimedia Commons files; `php artisan images:import` (also run by
+ * `npm install` and Admin → Media library) copies them to local storage.
  */
 class TravelSeeder extends Seeder
 {
     private function img(string $file, int $width = 1600): string
     {
-        return 'https://commons.wikimedia.org/wiki/Special:FilePath/'.$file.'?width='.$width;
+        return 'https://commons.wikimedia.org/wiki/Special:FilePath/'.rawurlencode($file).'?width='.$width;
     }
 
     public function run(): void
@@ -28,11 +29,11 @@ class TravelSeeder extends Seeder
         // ── Categories ──────────────────────────────────────────────
         $categories = collect([
             ['Mughal & Heritage', 'Forts, mosques and five thousand years of history', 'From the Indus cities of Mohenjo-daro and Taxila to the Mughal splendour of Lahore Fort and the Badshahi Mosque.', 'Lahore_Fort_view_from_Baradari.jpg'],
-            ['Sikh Yatra', 'The gurdwaras of Guru Nanak Dev Ji', 'Nankana Sahib, Kartarpur, Panja Sahib and Dera Sahib — guided with care for sangat travelling from Canada, the UK and the US.', 'Gurdwara_Janam_Asthan.jpg'],
-            ['Northern Highlands', 'The Karakoram, Hunza and the eight-thousanders', 'Glacier lakes, apricot orchards and the highest paved border crossing in the world.', 'Attabad_Lake.jpg'],
-            ['Desert & Cholistan', 'Nawabi palaces and the forts of the Thar', 'Bahawalpur’s palaces, Derawar Fort at sunset and a night under the stars in a private desert camp.', 'Derawar_Fort.jpg'],
-            ['Coast & Marine', 'The Makran coast and the Arabian Sea', 'Mud volcanoes, the Princess of Hope, the empty beaches of Kund Malir and turtles at Astola Island.', 'Kund_Malir_Beach.jpg'],
-            ['Sufi & Spiritual', 'Shrines, qawwali and living tradition', 'The shrines of Multan, Uch Sharif and Sehwan — with Thursday-night qawwali at Data Darbar.', 'Shah_Rukn-e-Alam_Tomb.jpg'],
+            ['Sikh Yatra', 'The gurdwaras of Guru Nanak Dev Ji', 'Nankana Sahib, Kartarpur, Panja Sahib and Dera Sahib — guided with care for sangat travelling from Canada, the UK and the US.', 'The_Gurdwara_Janam_Asthan_in_Nankana_Sahib,_Pakistan._01.jpg'],
+            ['Northern Highlands', 'The Karakoram, Hunza and the eight-thousanders', 'Glacier lakes, apricot orchards and the highest paved border crossing in the world.', 'Attabad_Lake,_Hunza.jpg'],
+            ['Desert & Cholistan', 'Nawabi palaces and the forts of the Thar', 'Bahawalpur’s palaces, Derawar Fort at sunset and a night under the stars in a private desert camp.', 'Derawar_Fort,_Cholistan,_Bahawalpur.jpg'],
+            ['Coast & Marine', 'The Makran coast and the Arabian Sea', 'Mud volcanoes, the Princess of Hope, the empty beaches of Kund Malir and turtles at Astola Island.', 'Kund_Malir_Beach,_Balochistan.jpg'],
+            ['Sufi & Spiritual', 'Shrines, qawwali and living tradition', 'The shrines of Multan, Uch Sharif and Sehwan — with Thursday-night qawwali at Data Darbar.', 'Tomb_of_Shah_Rukn-e-Alam,_Multan,_Pakistan_2016.jpg'],
         ])->mapWithKeys(fn ($c, $i) => [$c[0] => Category::create([
             'name' => $c[0], 'slug' => Str::slug($c[0]), 'tagline' => $c[1], 'description' => $c[2],
             'image' => $this->img($c[3]), 'sort_order' => $i,
@@ -40,20 +41,20 @@ class TravelSeeder extends Seeder
 
         // ── Destinations ────────────────────────────────────────────
         $destinations = collect([
-            ['Lahore', 'Punjab', 'The cultural heart of Pakistan', 'Lahore is Mughal gardens, the Walled City’s food streets and the Badshahi Mosque glowing at dusk. It is also home to Gurdwara Dera Sahib and the Samadhi of Maharaja Ranjit Singh.', 'Badshahi_Mosque_front_picture.jpg', ['Lahore Fort & Sheesh Mahal', 'Badshahi Mosque', 'Walled City food walk', 'Wagah border ceremony', 'Gurdwara Dera Sahib'], 'Oct – Mar', true],
-            ['Nankana Sahib', 'Punjab', 'Birthplace of Guru Nanak Dev Ji', 'A small Punjabi city, and the holiest place in Sikhism. Gurdwara Janam Asthan marks where Guru Nanak was born in 1469, and eight other gurdwaras around it mark episodes from his childhood.', 'Gurdwara_Janam_Asthan.jpg', ['Gurdwara Janam Asthan', 'Gurdwara Bal Lila', 'Gurdwara Tambu Sahib', 'Gurpurab celebrations'], 'Nov (Gurpurab) & Apr (Vaisakhi)', true],
-            ['Kartarpur', 'Punjab', 'Where Guru Nanak spent his final years', 'Gurdwara Darbar Sahib Kartarpur stands on the banks of the Ravi, where Guru Nanak farmed and taught for eighteen years. It is one of the largest gurdwara complexes in the world.', 'Gurdwara_Darbar_Sahib_Kartarpur.jpg', ['Gurdwara Darbar Sahib', 'Guru Nanak’s fields', 'Langar hall'], 'Oct – Apr', false],
-            ['Hasan Abdal', 'Punjab', 'Gurdwara Panja Sahib', 'Gurdwara Panja Sahib holds the rock said to bear the hand-print of Guru Nanak. It sits beside a spring on the old road between Taxila and Peshawar.', 'Gurdwara_Panja_Sahib.jpg', ['Gurdwara Panja Sahib', 'The sacred spring', 'Vaisakhi mela'], 'Year-round', false],
-            ['Islamabad', 'Islamabad Capital', 'A green capital beneath the Margalla Hills', 'Pakistan’s calm, leafy capital is usually where journeys north begin. The Faisal Mosque, Pakistan Monument and the hilltop viewpoints of Daman-e-Koh are all minutes apart.', 'Faisal_Mosque.jpg', ['Faisal Mosque', 'Pakistan Monument', 'Daman-e-Koh', 'Saidpur Village'], 'Year-round', false],
-            ['Taxila', 'Punjab', 'Gandharan cities and Buddhist monasteries', 'A UNESCO World Heritage Site where three ancient cities and dozens of Buddhist stupas trace a thousand years of Gandharan civilisation.', 'Dharmarajika_Stupa_Taxila.jpg', ['Dharmarajika Stupa', 'Sirkap', 'Jaulian Monastery', 'Taxila Museum'], 'Oct – Apr', false],
-            ['Hunza Valley', 'Gilgit-Baltistan', 'Apricot orchards beneath Rakaposhi', 'Hunza is the jewel of the Karakoram Highway: thousand-year-old forts, turquoise Attabad Lake and views of four peaks above 7,000 metres from a single village.', 'Attabad_Lake.jpg', ['Baltit & Altit Forts', 'Attabad Lake', 'Passu Cones', 'Khunjerab Pass'], 'Apr – Oct', true],
-            ['Skardu', 'Gilgit-Baltistan', 'Gateway to K2 and the Deosai Plains', 'Skardu sits where the Indus widens into a high, sandy valley. From here roads lead to the cold desert of Katpana, Shangrila’s lakes and the wildflower plateau of Deosai.', 'K2_2006b.jpg', ['Shangrila & Upper Kachura Lakes', 'Deosai National Park', 'Katpana cold desert', 'Shigar Fort'], 'May – Sep', true],
-            ['Fairy Meadows', 'Gilgit-Baltistan', 'Face to face with Nanga Parbat', 'A high alpine meadow reached by jeep and a short hike, with an uninterrupted view of the north face of Nanga Parbat, the ninth-highest mountain on earth.', 'Nanga_Parbat_The_Killer_Mountain.jpg', ['Nanga Parbat viewpoint', 'Beyal Camp hike', 'Raikot Bridge jeep road'], 'Jun – Sep', false],
-            ['Bahawalpur & Cholistan', 'Punjab', 'Palaces of the Nawabs and forts of the desert', 'Bahawalpur’s Noor Mahal and Darbar Mahal recall the princely state’s grandeur. Beyond the city, the Cholistan desert hides Derawar Fort and the yearly Cholistan Jeep Rally.', 'Derawar_Fort.jpg', ['Noor Mahal', 'Derawar Fort', 'Desert camp under the stars', 'Uch Sharif shrines'], 'Nov – Feb', true],
-            ['Multan', 'Punjab', 'The City of Saints', 'One of the oldest living cities in South Asia, famous for blue-tiled Sufi shrines, Multani pottery and the tomb of Shah Rukn-e-Alam.', 'Shah_Rukn-e-Alam_Tomb.jpg', ['Shah Rukn-e-Alam', 'Bahauddin Zakariya shrine', 'Blue pottery workshops'], 'Nov – Feb', false],
-            ['Makran Coast', 'Balochistan', 'Where the desert meets the Arabian Sea', 'The Makran Coastal Highway runs past wind-carved cliffs, the Princess of Hope rock formation and the near-empty sands of Kund Malir before reaching Gwadar.', 'Kund_Malir_Beach.jpg', ['Hingol National Park', 'Princess of Hope', 'Kund Malir beach', 'Gwadar Hammerhead'], 'Oct – Mar', true],
-            ['Karachi', 'Sindh', 'Pakistan’s city by the sea', 'A vast, energetic port city with colonial architecture, the Quaid’s Mausoleum and some of the best seafood in the country.', 'Mazar-e-Quaid.jpg', ['Mazar-e-Quaid', 'Mohatta Palace', 'Clifton Beach', 'Burns Road food street'], 'Nov – Feb', false],
-            ['Mohenjo-daro', 'Sindh', 'A 4,500-year-old city of the Indus', 'One of the world’s earliest planned cities, with a great bath, granaries and grid streets laid out around 2500 BCE.', 'Mohenjodaro_Sindh.jpeg', ['The Great Bath', 'Stupa mound', 'Site museum'], 'Nov – Feb', false],
+            ['Lahore', 'Punjab', 'The cultural heart of Pakistan', 'Lahore is Mughal gardens, the Walled City’s food streets and the Badshahi Mosque glowing at dusk. It is also home to Gurdwara Dera Sahib and the Samadhi of Maharaja Ranjit Singh.', 'BADSHAHI_MOSQUE_LAHORE.jpg', ['Lahore Fort & Sheesh Mahal', 'Badshahi Mosque', 'Walled City food walk', 'Wagah border ceremony', 'Gurdwara Dera Sahib'], 'Oct – Mar', true],
+            ['Nankana Sahib', 'Punjab', 'Birthplace of Guru Nanak Dev Ji', 'A small Punjabi city, and the holiest place in Sikhism. Gurdwara Janam Asthan marks where Guru Nanak was born in 1469, and eight other gurdwaras around it mark episodes from his childhood.', 'The_Gurdwara_Janam_Asthan_in_Nankana_Sahib,_Pakistan._01.jpg', ['Gurdwara Janam Asthan', 'Gurdwara Bal Lila', 'Gurdwara Tambu Sahib', 'Gurpurab celebrations'], 'Nov (Gurpurab) & Apr (Vaisakhi)', true],
+            ['Kartarpur', 'Punjab', 'Where Guru Nanak spent his final years', 'Gurdwara Darbar Sahib Kartarpur stands on the banks of the Ravi, where Guru Nanak farmed and taught for eighteen years. It is one of the largest gurdwara complexes in the world.', 'Gurdwara_Darbar_Sahib_Kartarpur_04.jpg', ['Gurdwara Darbar Sahib', 'Guru Nanak’s fields', 'Langar hall'], 'Oct – Apr', false],
+            ['Hasan Abdal', 'Punjab', 'Gurdwara Panja Sahib', 'Gurdwara Panja Sahib holds the rock said to bear the hand-print of Guru Nanak. It sits beside a spring on the old road between Taxila and Peshawar.', 'Gudwara_Panja_Sahib_-_Flickr_-_Al_Jazeera_English_(2).jpg', ['Gurdwara Panja Sahib', 'The sacred spring', 'Vaisakhi mela'], 'Year-round', false],
+            ['Islamabad', 'Islamabad Capital', 'A green capital beneath the Margalla Hills', 'Pakistan’s calm, leafy capital is usually where journeys north begin. The Faisal Mosque, Pakistan Monument and the hilltop viewpoints of Daman-e-Koh are all minutes apart.', 'Faisal_Mosque,_Islamabad_III.jpg', ['Faisal Mosque', 'Pakistan Monument', 'Daman-e-Koh', 'Saidpur Village'], 'Year-round', false],
+            ['Taxila', 'Punjab', 'Gandharan cities and Buddhist monasteries', 'A UNESCO World Heritage Site where three ancient cities and dozens of Buddhist stupas trace a thousand years of Gandharan civilisation.', 'Dharmarajika_stupa,Taxila.jpg', ['Dharmarajika Stupa', 'Sirkap', 'Jaulian Monastery', 'Taxila Museum'], 'Oct – Apr', false],
+            ['Hunza Valley', 'Gilgit-Baltistan', 'Apricot orchards beneath Rakaposhi', 'Hunza is the jewel of the Karakoram Highway: thousand-year-old forts, turquoise Attabad Lake and views of four peaks above 7,000 metres from a single village.', 'Attabad_Lake,_Hunza.jpg', ['Baltit & Altit Forts', 'Attabad Lake', 'Passu Cones', 'Khunjerab Pass'], 'Apr – Oct', true],
+            ['Skardu', 'Gilgit-Baltistan', 'Gateway to K2 and the Deosai Plains', 'Skardu sits where the Indus widens into a high, sandy valley. From here roads lead to the cold desert of Katpana, Shangrila’s lakes and the wildflower plateau of Deosai.', 'Shangrila_Resort,_Lower_Kachura_Lake,_Pakistan.jpg', ['Shangrila & Upper Kachura Lakes', 'Deosai National Park', 'Katpana cold desert', 'Shigar Fort'], 'May – Sep', true],
+            ['Fairy Meadows', 'Gilgit-Baltistan', 'Face to face with Nanga Parbat', 'A high alpine meadow reached by jeep and a short hike, with an uninterrupted view of the north face of Nanga Parbat, the ninth-highest mountain on earth.', 'Nanga_Parbat_(Fairy_Meadows).jpg', ['Nanga Parbat viewpoint', 'Beyal Camp hike', 'Raikot Bridge jeep road'], 'Jun – Sep', false],
+            ['Bahawalpur & Cholistan', 'Punjab', 'Palaces of the Nawabs and forts of the desert', 'Bahawalpur’s Noor Mahal and Darbar Mahal recall the princely state’s grandeur. Beyond the city, the Cholistan desert hides Derawar Fort and the yearly Cholistan Jeep Rally.', 'Derawar_Fort,_Cholistan,_Bahawalpur.jpg', ['Noor Mahal', 'Derawar Fort', 'Desert camp under the stars', 'Uch Sharif shrines'], 'Nov – Feb', true],
+            ['Multan', 'Punjab', 'The City of Saints', 'One of the oldest living cities in South Asia, famous for blue-tiled Sufi shrines, Multani pottery and the tomb of Shah Rukn-e-Alam.', 'Tomb_of_Shah_Rukn-e-Alam,_Multan,_Pakistan_2016.jpg', ['Shah Rukn-e-Alam', 'Bahauddin Zakariya shrine', 'Blue pottery workshops'], 'Nov – Feb', false],
+            ['Makran Coast', 'Balochistan', 'Where the desert meets the Arabian Sea', 'The Makran Coastal Highway runs past wind-carved cliffs, the Princess of Hope rock formation and the near-empty sands of Kund Malir before reaching Gwadar.', 'Kund_Malir_Beach,_Balochistan.jpg', ['Hingol National Park', 'Princess of Hope', 'Kund Malir beach', 'Gwadar Hammerhead'], 'Oct – Mar', true],
+            ['Karachi', 'Sindh', 'Pakistan’s city by the sea', 'A vast, energetic port city with colonial architecture, the Quaid’s Mausoleum and some of the best seafood in the country.', 'Mazar-e-Quaid_Karachi.jpg', ['Mazar-e-Quaid', 'Mohatta Palace', 'Clifton Beach', 'Burns Road food street'], 'Nov – Feb', false],
+            ['Mohenjo-daro', 'Sindh', 'A 4,500-year-old city of the Indus', 'One of the world’s earliest planned cities, with a great bath, granaries and grid streets laid out around 2500 BCE.', 'Mohenjo-daro.jpg', ['The Great Bath', 'Stupa mound', 'Site museum'], 'Nov – Feb', false],
         ])->mapWithKeys(fn ($d, $i) => [$d[0] => Destination::create([
             'name' => $d[0], 'slug' => Str::slug($d[0]), 'region' => $d[1], 'tagline' => $d[2], 'description' => $d[3],
             'image' => $this->img($d[4]), 'highlights' => $d[5], 'best_season' => $d[6], 'is_featured' => $d[7], 'sort_order' => $i,
@@ -99,7 +100,7 @@ class TravelSeeder extends Seeder
                 'summary' => 'A nine-day pilgrimage to Nankana Sahib, Kartarpur, Panja Sahib and the gurdwaras of Lahore, with comfortable stays and a Punjabi-speaking guide.',
                 'overview' => "Designed for Sikh families and sangat travelling from Canada, the UK and the US, this yatra visits the gurdwaras most closely linked to Guru Nanak Dev Ji and Maharaja Ranjit Singh.\n\nWe handle the paperwork for visits to every gurdwara, plan around ardas and langar times, and keep driving days short. Departures can be timed for Gurpurab in November or Vaisakhi in April.",
                 'days' => 9, 'price' => 2450, 'original' => 2790, 'group' => 'Private · 2–20 guests', 'difficulty' => 'Easy',
-                'season' => 'Oct – Apr', 'start' => 'Lahore', 'image' => 'Gurdwara_Janam_Asthan.jpg', 'featured' => true, 'rating' => 5.0,
+                'season' => 'Oct – Apr', 'start' => 'Lahore', 'image' => 'The_Gurdwara_Janam_Asthan_in_Nankana_Sahib,_Pakistan._01.jpg', 'featured' => true, 'rating' => 5.0,
                 'destinations' => ['Lahore', 'Nankana Sahib', 'Kartarpur', 'Hasan Abdal', 'Islamabad'],
                 'highlights' => ['Ardas at Gurdwara Janam Asthan, Nankana Sahib', 'A full day at Kartarpur’s Gurdwara Darbar Sahib', 'Panja Sahib and the sacred spring at Hasan Abdal', 'Samadhi of Maharaja Ranjit Singh and Gurdwara Dera Sahib', 'Optional visit to your ancestral village'],
                 'itinerary' => [
@@ -120,7 +121,7 @@ class TravelSeeder extends Seeder
                 'summary' => 'Ten days up the Karakoram Highway to Hunza, Attabad Lake and the Khunjerab Pass on the China border, with a night facing Nanga Parbat.',
                 'overview' => "The Karakoram Highway is one of the great road journeys on earth. We drive it slowly, with stops at petroglyphs, the confluence of three mountain ranges and the best viewpoints of Rakaposhi.\n\nStays include a lakeside resort on Attabad Lake and a garden inn in Karimabad. Flights between Islamabad and Gilgit can be added on request to shorten the drive.",
                 'days' => 10, 'price' => 2890, 'original' => null, 'group' => 'Private · 2–12 guests', 'difficulty' => 'Moderate',
-                'season' => 'Apr – Oct', 'start' => 'Islamabad', 'image' => 'Attabad_Lake.jpg', 'featured' => true, 'rating' => 4.9,
+                'season' => 'Apr – Oct', 'start' => 'Islamabad', 'image' => 'Attabad_Lake,_Hunza.jpg', 'featured' => true, 'rating' => 4.9,
                 'destinations' => ['Islamabad', 'Fairy Meadows', 'Hunza Valley'],
                 'highlights' => ['Sunrise over Nanga Parbat from Fairy Meadows', 'Baltit and Altit forts in Karimabad', 'Boat ride on Attabad Lake', 'Khunjerab Pass at 4,693 m', 'Passu Cones and the Hussaini suspension bridge'],
                 'itinerary' => [
@@ -180,7 +181,7 @@ class TravelSeeder extends Seeder
                 'summary' => 'Five days from Lahore to the princely city of Bahawalpur and a private camp beneath the walls of Derawar Fort.',
                 'overview' => 'Southern Punjab is rarely visited and endlessly rewarding. Explore the Nawabs’ palaces, the shrines of Uch Sharif and the forty bastions of Derawar Fort, then spend a night in a luxury desert camp with folk musicians and a sky full of stars.',
                 'days' => 5, 'price' => 1450, 'original' => 1590, 'group' => 'Private · 2–12 guests', 'difficulty' => 'Easy',
-                'season' => 'Nov – Feb', 'start' => 'Lahore', 'image' => 'Derawar_Fort.jpg', 'featured' => true, 'rating' => 4.8,
+                'season' => 'Nov – Feb', 'start' => 'Lahore', 'image' => 'Derawar_Fort,_Cholistan,_Bahawalpur.jpg', 'featured' => true, 'rating' => 4.8,
                 'destinations' => ['Lahore', 'Bahawalpur & Cholistan', 'Multan'],
                 'highlights' => ['Noor Mahal by night', 'Sunset at Derawar Fort', 'Private desert camp with folk music', 'The tiled tombs of Uch Sharif', 'Multan’s shrines on the way back'],
                 'itinerary' => [
@@ -197,7 +198,7 @@ class TravelSeeder extends Seeder
                 'summary' => 'Six days along the Makran Coastal Highway — mud volcanoes, the Princess of Hope, empty beaches and Gwadar’s hammerhead peninsula.',
                 'overview' => 'Few travellers know Pakistan has 1,000 km of coastline. This road journey from Karachi follows the Arabian Sea through Hingol National Park to Gwadar, with a night in beach huts at Kund Malir.',
                 'days' => 6, 'price' => 1890, 'original' => null, 'group' => 'Private · 2–8 guests', 'difficulty' => 'Moderate',
-                'season' => 'Oct – Mar', 'start' => 'Karachi', 'image' => 'Kund_Malir_Beach.jpg', 'featured' => false, 'rating' => 4.9,
+                'season' => 'Oct – Mar', 'start' => 'Karachi', 'image' => 'Kund_Malir_Beach,_Balochistan.jpg', 'featured' => false, 'rating' => 4.9,
                 'destinations' => ['Karachi', 'Makran Coast'],
                 'highlights' => ['The Princess of Hope and Sphinx of Balochistan', 'Chandragup mud volcano', 'Beach night at Kund Malir', 'Gwadar from Koh-e-Batil', 'Optional boat trip to Astola Island'],
                 'itinerary' => [
