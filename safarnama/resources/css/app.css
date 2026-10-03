@@ -1,0 +1,98 @@
+@import 'tailwindcss';
+
+@source '../../vendor/laravel/framework/src/Illuminate/Pagination/resources/views/*.blade.php';
+@source '../../storage/framework/views/*.php';
+
+/*
+ * Safarnama brand
+ * Pine     – the green of the national flag and the gardens of Shalimar
+ * Brass    – gilded Mughal metalwork and truck-art trim
+ * Marble   – the white marble of the Badshahi domes
+ * Sandstone– the red sandstone of Lahore Fort (used sparingly)
+ */
+@theme {
+    --font-sans: 'Manrope', ui-sans-serif, system-ui, sans-serif;
+    --font-display: 'Cormorant Garamond', ui-serif, Georgia, serif;
+
+    --color-pine-50: #eef5f2;
+    --color-pine-100: #d5e7df;
+    --color-pine-200: #a9cfbf;
+    --color-pine-300: #75b09a;
+    --color-pine-400: #478f76;
+    --color-pine-500: #2c735c;
+    --color-pine-600: #1f5c4a;
+    --color-pine-700: #19493c;
+    --color-pine-800: #133a30;
+    --color-pine-900: #0e2c25;
+    --color-pine-950: #081a16;
+
+    --color-brass-100: #f6ecd5;
+    --color-brass-200: #ecd8a8;
+    --color-brass-300: #e0c07a;
+    --color-brass-400: #d3a955;
+    --color-brass-500: #c09040;
+    --color-brass-600: #a07432;
+    --color-brass-700: #7d5a29;
+
+    --color-marble-50: #fbf9f4;
+    --color-marble-100: #f5f1e8;
+    --color-marble-200: #ebe4d4;
+    --color-marble-300: #dcd2bc;
+
+    --color-sandstone-500: #a5452f;
+    --color-sandstone-600: #8a3826;
+
+    --color-ink: #16201d;
+}
+
+@layer base {
+    html { scroll-behavior: smooth; -webkit-tap-highlight-color: transparent; }
+    body { @apply bg-marble-50 text-ink font-sans antialiased; }
+    ::selection { @apply bg-brass-200 text-pine-950; }
+    [x-cloak] { display: none !important; }
+}
+
+@layer components {
+    .container-x { @apply mx-auto w-full max-w-7xl px-4 sm:px-6 lg:px-8; }
+
+    .eyebrow { @apply text-[0.8rem] font-semibold tracking-[0.18em] text-brass-600; }
+    .heading-xl { @apply font-display text-[2.6rem] leading-[1.02] font-medium tracking-tight sm:text-6xl lg:text-7xl; }
+    .heading-lg { @apply font-display text-4xl leading-[1.05] font-medium tracking-tight sm:text-5xl; }
+    .heading-md { @apply font-display text-3xl leading-tight font-medium sm:text-4xl; }
+
+    .btn { @apply inline-flex items-center justify-center gap-2 rounded-full px-6 py-3 text-sm font-semibold transition duration-200 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brass-500 disabled:opacity-60; }
+    .btn-primary { @apply bg-pine-800 text-marble-50 hover:bg-pine-700; }
+    .btn-brass { @apply bg-brass-400 text-pine-950 hover:bg-brass-300; }
+    .btn-ghost { @apply border border-pine-800/20 text-pine-900 hover:border-pine-800 hover:bg-pine-800 hover:text-marble-50; }
+    .btn-ghost-light { @apply border border-marble-50/30 text-marble-50 hover:bg-marble-50 hover:text-pine-950; }
+
+    .field { @apply block w-full rounded-xl border border-marble-300 bg-white px-4 py-3 text-sm text-ink placeholder:text-ink/40 transition focus:border-pine-600 focus:ring-4 focus:ring-pine-600/10 focus:outline-none; }
+    .label { @apply mb-1.5 block text-xs font-semibold text-ink/70; }
+
+    /* Pointed Mughal arch, used as the site's signature frame. */
+    .arch {
+        -webkit-mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 140' preserveAspectRatio='none'%3E%3Cpath d='M0 140V46C0 22 24 10 40 5 46 3 49 1 50 0c1 1 4 3 10 5 16 5 40 17 40 41v94Z'/%3E%3C/svg%3E") center / 100% 100% no-repeat;
+        mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 140' preserveAspectRatio='none'%3E%3Cpath d='M0 140V46C0 22 24 10 40 5 46 3 49 1 50 0c1 1 4 3 10 5 16 5 40 17 40 41v94Z'/%3E%3C/svg%3E") center / 100% 100% no-repeat;
+    }
+
+    /* Shown behind every photo, so a missing image still looks intentional. */
+    .media-fallback {
+        background-color: var(--color-pine-800);
+        background-image:
+            radial-gradient(120% 80% at 20% 0%, rgb(211 169 85 / 0.35), transparent 60%),
+            url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='48' height='48' viewBox='0 0 48 48'%3E%3Cg fill='none' stroke='%23d3a955' stroke-opacity='.18'%3E%3Cpath d='M24 0 48 24 24 48 0 24Z'/%3E%3Ccircle cx='24' cy='24' r='9'/%3E%3C/g%3E%3C/svg%3E");
+    }
+
+    .jali-bg {
+        background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='56' height='56' viewBox='0 0 56 56'%3E%3Cg fill='none' stroke='%23d3a955' stroke-opacity='.12'%3E%3Cpath d='M28 0 56 28 28 56 0 28Z'/%3E%3Ccircle cx='28' cy='28' r='11'/%3E%3C/g%3E%3C/svg%3E");
+    }
+
+    .prose-travel p { @apply mb-4 leading-relaxed text-ink/75; }
+}
+
+[data-reveal] { opacity: 0; transform: translateY(18px); transition: opacity .7s ease, transform .7s ease; }
+[data-reveal].is-visible { opacity: 1; transform: none; }
+@media (prefers-reduced-motion: reduce) { [data-reveal] { opacity: 1; transform: none; transition: none; } }
+
+/* Lift the WhatsApp button above the mobile booking bar on journey pages. */
+@media (max-width: 1023px) { body:has(#mobile-book-bar) .wa-float { bottom: 5.5rem; } }
