@@ -20,8 +20,8 @@
                         <td class="py-3 text-ink/70">{{ Str::limit($b->package?->title ?? '—', 32) }}</td>
                         <td class="py-3 text-ink/70">{{ $b->start_date?->format('j M Y') }}</td>
                         <td class="py-3 text-ink/70">{{ $b->travelers }}</td>
-                        <td class="py-3 text-ink/70">{{ money($b->total_estimate) }}</td>
-                        <td class="py-3"><x-admin.status :status="$b->status"/></td>
+                        <td class="py-3 text-ink/70">{{ money_base($b->total_estimate) }}</td>
+                        <td class="py-3"><x-admin.status :status="$b->status"/>@if ($b->payment_status !== 'unpaid')<span class="ml-1 rounded-md bg-brand-100 px-1.5 py-0.5 text-xs font-semibold text-brand-800">{{ $b->payment_status === 'paid' ? 'Paid' : 'Deposit' }}</span>@endif</td>
                         <td class="py-3 pr-5 text-xs text-ink/50">{{ $b->created_at->diffForHumans() }}</td>
                     </tr>
                 @empty

@@ -13,7 +13,7 @@
                         @if (! $p->is_published)<span class="rounded-full bg-slate-200 px-2 py-0.5 text-xs text-ink/60">Draft</span>@endif
                         @if ($p->is_featured)<span class="rounded-full bg-lake-50 px-2 py-0.5 text-xs text-lake-700">Featured</span>@endif
                     </div>
-                    <p class="mt-1 text-sm text-ink/55">{{ $p->category?->name ?? 'Uncategorised' }} · {{ $p->duration_days }} days · {{ money($p->price) }} · {{ $p->bookings_count }} {{ Str::plural('booking', $p->bookings_count) }}</p>
+                    <p class="mt-1 text-sm text-ink/55">{{ $p->category?->name ?? 'Uncategorised' }} · {{ $p->duration_days }} days · {{ money_base($p->price) }} · {{ $p->bookings_count }} {{ Str::plural('booking', $p->bookings_count) }}</p>
                 </div>
                 <div class="flex items-center gap-1 px-1">
                     <a href="{{ route('packages.show', $p) }}" target="_blank" class="inline-flex items-center gap-1.5 rounded-lg px-2.5 py-1.5 text-xs font-semibold text-ink/60 hover:bg-slate-100"><x-icon name="eye" class="size-4"/>View</a>

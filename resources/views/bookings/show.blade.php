@@ -8,12 +8,22 @@
                 <p class="mt-8 inline-block rounded-full bg-slate-100 px-5 py-2 text-sm">Your reference: <span class="font-mono font-semibold tracking-wider text-slate-900">{{ $booking->reference }}</span></p>
             </div>
 
+            @if (app(\App\Support\Payments\PaymentGateways::class)->enabled()->isNotEmpty() && $booking->balanceDue() > 0)
+                <div class="mt-6 flex flex-col items-start justify-between gap-4 rounded-2xl bg-brand-50 p-6 ring-1 ring-brand-100 sm:flex-row sm:items-center">
+                    <div>
+                        <p class="font-semibold text-slate-900">Want to lock in your dates now?</p>
+                        <p class="text-sm text-slate-600">Pay a {{ (int) setting('deposit_percent', 25) }}% deposit securely online. We’ll still confirm everything with you first.</p>
+                    </div>
+                    <a href="{{ route('bookings.pay', $booking) }}" class="btn btn-primary shrink-0">Pay deposit now</a>
+                </div>
+            @endif
+
             <dl class="mt-6 grid gap-px overflow-hidden rounded-3xl bg-slate-200 ring-1 ring-slate-200 sm:grid-cols-2">
                 @foreach ([
                     ['Journey', $booking->package?->title ?? '—'],
                     ['Start date', $booking->start_date?->format('j F Y')],
                     ['Travellers', $booking->adults.' '.Str::plural('adult', $booking->adults).($booking->children ? ', '.$booking->children.' '.Str::plural('child', $booking->children) : '')],
-                    ['Estimated total', money($booking->total_estimate).' USD'],
+                    ['Estimated total', $booking->currency ? format_money($booking->total_estimate * $booking->exchange_rate, $booking->currency) : money_base($booking->total_estimate)],
                 ] as [$label, $value])
                     <div class="bg-white p-6">
                         <dt class="text-xs font-semibold text-ink/50">{{ $label }}</dt>

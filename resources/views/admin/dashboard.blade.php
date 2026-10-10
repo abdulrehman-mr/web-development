@@ -11,7 +11,7 @@
     <div class="mt-4 rounded-2xl bg-brand-900 p-5 text-white sm:flex sm:items-center sm:justify-between">
         <div>
             <p class="text-sm text-white/60">Open pipeline (pending + confirmed)</p>
-            <p class="mt-1 font-display text-4xl font-semibold">{{ money($pipeline) }} <span class="text-base font-normal text-white/50">USD</span></p>
+            <p class="mt-1 font-display text-4xl font-semibold">{{ money_base($pipeline) }} <span class="text-base font-normal text-white/50">{{ currencies()->base()->code }}</span></p>
         </div>
         <div class="mt-4 flex flex-wrap gap-2 sm:mt-0">
             <a href="{{ route('admin.packages.create') }}" class="btn btn-light py-2.5"><x-icon name="plus" class="size-4"/>New journey</a>

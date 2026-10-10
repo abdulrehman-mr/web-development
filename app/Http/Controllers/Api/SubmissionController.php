@@ -21,13 +21,13 @@ class SubmissionController extends Controller
 
         $booking = $package->bookings()->create($data + [
             'total_estimate' => BookingController::estimate($package, $data['adults'], $data['children']),
-        ]);
+        ] + BookingController::currencySnapshot());
 
         return response()->json(['data' => [
             'reference' => $booking->reference,
             'status' => $booking->status,
             'total_estimate' => (float) $booking->total_estimate,
-            'currency' => 'USD',
+            'currency' => currencies()->base()->code,
         ]], 201);
     }
 

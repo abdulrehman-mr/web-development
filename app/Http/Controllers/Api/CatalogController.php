@@ -102,7 +102,7 @@ class CatalogController extends Controller
             'duration_days' => $p->duration_days,
             'price' => (float) $p->price,
             'original_price' => $p->original_price ? (float) $p->original_price : null,
-            'currency' => 'USD',
+            'currency' => currencies()->base()->code,
             'group_size' => $p->group_size,
             'difficulty' => $p->difficulty,
             'best_season' => $p->best_season,

@@ -89,7 +89,7 @@
 
             <x-admin.card title="Price & trip facts">
                 <div class="grid grid-cols-2 gap-4">
-                    <x-admin.input name="price" type="number" step="1" min="0" label="Price (USD pp)" :value="$package->price" required/>
+                    <x-admin.input name="price" type="number" step="1" min="0" :label="'Price ('.currencies()->base()->code.' per person)'" :value="$package->price" required/>
                     <x-admin.input name="original_price" type="number" step="1" min="0" label="Was (optional)" :value="$package->original_price"/>
                     <x-admin.input name="duration_days" type="number" min="1" label="Days" :value="$package->duration_days" required/>
                     <x-admin.input name="rating" type="number" step="0.1" min="0" max="5" label="Rating" :value="$package->rating"/>

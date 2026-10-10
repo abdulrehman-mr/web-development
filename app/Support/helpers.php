@@ -1,6 +1,7 @@
 <?php
 
 use App\Models\Setting;
+use App\Support\CurrencyManager;
 use Illuminate\Support\Facades\Storage;
 
 if (! function_exists('media_url')) {
@@ -28,11 +29,37 @@ if (! function_exists('setting')) {
     }
 }
 
-if (! function_exists('money')) {
-    function money(float|int|string|null $amount, string $currency = 'USD'): string
+if (! function_exists('currencies')) {
+    function currencies(): CurrencyManager
     {
-        $symbol = $currency === 'CAD' ? 'CA$' : '$';
+        return app(CurrencyManager::class);
+    }
+}
 
-        return $symbol.number_format((float) $amount, 0);
+if (! function_exists('money')) {
+    /** A base-currency amount converted to, and formatted in, the visitor's currency (or the given one). */
+    function money(float|int|string|null $baseAmount, ?string $currency = null): string
+    {
+        $manager = currencies();
+
+        return $manager->display($baseAmount, $currency ? $manager->find($currency) : null);
+    }
+}
+
+if (! function_exists('money_base')) {
+    /** A base-currency amount formatted in the base currency (used in the admin panel). */
+    function money_base(float|int|string|null $amount): string
+    {
+        return currencies()->base()->format($amount, 0);
+    }
+}
+
+if (! function_exists('format_money')) {
+    /** An amount that is already in the given currency. */
+    function format_money(float|int|string|null $amount, string $currency): string
+    {
+        $model = currencies()->find($currency);
+
+        return $model ? $model->format($amount) : $currency.' '.number_format((float) $amount, 2);
     }
 }

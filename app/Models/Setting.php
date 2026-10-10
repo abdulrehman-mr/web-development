@@ -2,8 +2,10 @@
 
 namespace App\Models;
 
+use Illuminate\Contracts\Encryption\DecryptException;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Facades\Cache;
+use Illuminate\Support\Facades\Crypt;
 
 class Setting extends Model
 {
@@ -54,9 +56,6 @@ class Setting extends Model
             'contact_address' => ['Office address', 'textarea', null],
             'office_hours' => ['Office hours', 'text', null],
         ],
-        'Pricing' => [
-            'cad_rate' => ['USD → CAD rate', 'text', 'Used to show an approximate Canadian-dollar price. Leave empty to hide.'],
-        ],
         'Social' => [
             'social_instagram' => ['Instagram URL', 'text', null],
             'social_facebook' => ['Facebook URL', 'text', null],
@@ -69,6 +68,26 @@ class Setting extends Model
         $all = Cache::rememberForever('settings', fn () => static::query()->pluck('value', 'key')->all());
 
         return filled($all[$key] ?? null) ? $all[$key] : $default;
+    }
+
+    /** Read a value stored with putSecret(); returns null if it cannot be decrypted. */
+    public static function secret(string $key): ?string
+    {
+        $value = static::get($key);
+        if (blank($value)) {
+            return null;
+        }
+
+        try {
+            return Crypt::decryptString($value);
+        } catch (DecryptException) {
+            return null;
+        }
+    }
+
+    public static function putSecret(string $key, ?string $value): void
+    {
+        static::put([$key => blank($value) ? null : Crypt::encryptString($value)]);
     }
 
     public static function put(array $values): void

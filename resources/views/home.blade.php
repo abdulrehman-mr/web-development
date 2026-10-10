@@ -1,52 +1,47 @@
 <x-site-layout>
-    {{-- ── Hero: clean white, with the Mughal arch as the one signature shape ── --}}
-    <section class="pt-16 lg:pt-[4.5rem]">
-        <div class="container-x grid items-center gap-10 py-10 sm:py-14 lg:grid-cols-12 lg:gap-14 lg:py-20">
+    {{-- ── Hero: photo-led on mobile, white with the Mughal arch on desktop ── --}}
+    <section class="relative isolate pt-16 lg:pt-[4.5rem]">
+        <div class="absolute inset-x-0 top-16 -z-10 h-[31rem] sm:h-[34rem] lg:hidden">
+            <x-media :src="media_url(setting('hero_image'))" alt="" eager class="absolute! inset-0"/>
+            <div class="absolute inset-0 bg-gradient-to-b from-slate-950/55 via-slate-950/40 to-slate-950/85"></div>
+        </div>
+
+        <div class="container-x grid lg:grid-cols-12 lg:items-center lg:gap-14 lg:py-20">
             <div class="lg:col-span-7">
-                @if (setting('hero_eyebrow'))
-                    <p class="mb-6 inline-flex items-center gap-2 rounded-full bg-brand-50 px-3 py-1.5 text-sm font-medium text-brand-800 ring-1 ring-brand-100">
-                        <x-icon name="plane" class="size-4"/>{{ setting('hero_eyebrow') }}
-                    </p>
-                @endif
-                <h1 class="heading-xl text-balance text-slate-900">{{ setting('hero_title') }}</h1>
-                <p class="mt-6 max-w-xl text-lg leading-relaxed text-slate-600">{{ setting('hero_subtitle') }}</p>
+                <div class="flex min-h-[31rem] flex-col justify-end pt-10 pb-24 text-white sm:min-h-[34rem] lg:block lg:min-h-0 lg:p-0 lg:text-slate-900">
+                    @if (setting('hero_eyebrow'))
+                        <p class="mb-5 inline-flex w-fit items-center gap-2 rounded-full bg-white/15 px-3 py-1.5 text-sm font-medium ring-1 ring-white/25 backdrop-blur lg:mb-6 lg:bg-brand-50 lg:text-brand-800 lg:ring-brand-100 lg:backdrop-blur-none">
+                            <x-icon name="plane" class="size-4 shrink-0"/><span>{{ setting('hero_eyebrow') }}</span>
+                        </p>
+                    @endif
+                    <h1 class="heading-xl text-balance">{{ setting('hero_title') }}</h1>
+                    <p class="mt-4 max-w-xl text-base leading-relaxed text-white/85 sm:text-lg lg:mt-6 lg:text-slate-600">{{ setting('hero_subtitle') }}</p>
+                </div>
 
                 {{-- Journey finder --}}
-                <form action="{{ route('packages.index') }}" method="get" class="mt-9 grid gap-1 rounded-2xl bg-white p-2 shadow-[0_12px_40px_-12px_rgb(15_23_42/0.25)] ring-1 ring-slate-200 sm:grid-cols-[1fr_1fr_auto] sm:items-center">
-                    <label class="rounded-xl px-4 py-2.5 transition hover:bg-slate-50 sm:border-r sm:border-slate-200 sm:rounded-r-none">
-                        <span class="block text-xs font-semibold text-slate-900">Experience</span>
-                        <select name="category" class="-ml-1 w-full cursor-pointer appearance-none bg-transparent text-sm text-slate-600 outline-none">
-                            <option value="">Any experience</option>
-                            @foreach ($categories as $category)
-                                <option value="{{ $category->slug }}">{{ $category->name }}</option>
-                            @endforeach
-                        </select>
-                    </label>
-                    <label class="rounded-xl px-4 py-2.5 transition hover:bg-slate-50">
-                        <span class="block text-xs font-semibold text-slate-900">Trip length</span>
-                        <select name="duration" class="-ml-1 w-full cursor-pointer appearance-none bg-transparent text-sm text-slate-600 outline-none">
-                            <option value="">Any length</option>
-                            <option value="short">Up to 6 days</option>
-                            <option value="medium">7 – 9 days</option>
-                            <option value="long">10 days or more</option>
-                        </select>
-                    </label>
-                    <button class="btn btn-primary py-3.5"><x-icon name="search" class="size-4.5"/> Find journeys</button>
+                <form action="{{ route('packages.index') }}" method="get" class="relative -mt-16 rounded-2xl bg-white p-4 shadow-[0_20px_50px_-20px_rgb(15_23_42/0.35)] ring-1 ring-slate-200 sm:p-5 lg:mt-9">
+                    <p class="mb-4 flex items-center gap-2 text-sm font-semibold text-slate-900"><x-icon name="search" class="size-4 text-brand-600"/>Find your journey</p>
+                    <div class="grid gap-3 sm:grid-cols-3">
+                        <x-select-field name="category" label="Experience" icon="sparkle" placeholder="Any experience" :options="$categories->pluck('name', 'slug')"/>
+                        <x-select-field name="destination" label="Destination" icon="map-pin" placeholder="Anywhere" :options="$searchDestinations->pluck('name', 'slug')"/>
+                        <x-select-field name="duration" label="Trip length" icon="clock" placeholder="Any length" :options="['short' => 'Up to 6 days', 'medium' => '7 – 9 days', 'long' => '10 days or more']"/>
+                    </div>
+                    <button class="btn btn-primary mt-4 w-full py-3.5"><x-icon name="search" class="size-4.5"/>Search journeys</button>
                 </form>
 
-                <ul class="mt-8 grid grid-cols-2 gap-x-6 gap-y-3 text-sm text-slate-600 sm:flex sm:flex-wrap">
-                    <li class="flex items-center gap-2"><x-icon name="plane" class="size-4.5 text-brand-600"/>Airport welcome</li>
-                    <li class="flex items-center gap-2"><x-icon name="document" class="size-4.5 text-brand-600"/>E-visa letter</li>
-                    <li class="flex items-center gap-2"><x-icon name="shield" class="size-4.5 text-brand-600"/>Licensed guides</li>
-                    <li class="flex items-center gap-2"><x-icon name="phone" class="size-4.5 text-brand-600"/>Toronto & Lahore desks</li>
+                <ul class="mt-6 grid grid-cols-2 gap-x-6 gap-y-3 text-sm text-slate-600 sm:flex sm:flex-wrap lg:mt-8">
+                    <li class="flex items-center gap-2"><x-icon name="plane" class="size-4.5 shrink-0 text-brand-600"/>Airport welcome</li>
+                    <li class="flex items-center gap-2"><x-icon name="document" class="size-4.5 shrink-0 text-brand-600"/>E-visa letter</li>
+                    <li class="flex items-center gap-2"><x-icon name="shield" class="size-4.5 shrink-0 text-brand-600"/>Licensed guides</li>
+                    <li class="flex items-center gap-2"><x-icon name="phone" class="size-4.5 shrink-0 text-brand-600"/>Toronto & Lahore desks</li>
                 </ul>
             </div>
 
-            <div class="lg:col-span-5">
-                <div class="relative mx-auto w-full max-w-[19rem] sm:max-w-sm lg:max-w-none">
+            <div class="hidden lg:col-span-5 lg:block">
+                <div class="relative">
                     <x-media :src="media_url(setting('hero_image'))" alt="Badshahi Mosque, Lahore" eager class="arch aspect-[4/5]"/>
                     @if ($yatra)
-                        <a href="{{ route('packages.show', $yatra) }}" class="absolute -bottom-5 -left-3 flex max-w-[16rem] items-center gap-3 rounded-2xl bg-white p-3 pr-4 shadow-xl ring-1 ring-slate-200 transition hover:ring-brand-300 sm:-left-8">
+                        <a href="{{ route('packages.show', $yatra) }}" class="absolute -bottom-5 -left-8 flex max-w-[16rem] items-center gap-3 rounded-2xl bg-white p-3 pr-4 shadow-xl ring-1 ring-slate-200 transition hover:ring-brand-300">
                             <x-media :src="$yatra->hero_image_url" class="size-12 shrink-0 rounded-xl"/>
                             <span class="min-w-0">
                                 <span class="block truncate text-sm font-semibold text-slate-900">{{ $yatra->category?->name }}</span>
@@ -60,7 +55,7 @@
     </section>
 
     {{-- ── Experiences: mosaic, first tile larger ── --}}
-    <section class="py-16 sm:py-24">
+    <section class="pt-14 pb-16 sm:py-24">
         <div class="container-x">
             <div class="flex flex-col justify-between gap-4 sm:flex-row sm:items-end">
                 <x-section-heading title="Six ways to discover Pakistan" intro="Every journey is private and can be tailored around your dates, pace and family."/>

@@ -10,6 +10,8 @@
     ];
     $experiences = \App\Models\Category::orderBy('sort_order')->get(['name', 'slug', 'tagline']);
     $whatsapp = setting('contact_whatsapp');
+    $switchable = setting('currency_switcher', '1') === '1' ? currencies()->enabled() : collect();
+    $currentCurrency = currencies()->current();
 @endphp
 <!DOCTYPE html>
 <html lang="en">
@@ -20,12 +22,13 @@
     <meta name="description" content="{{ $description ?? setting('hero_subtitle') }}">
     <meta property="og:title" content="{{ $title ?? $siteName }}">
     <meta property="og:description" content="{{ $description ?? setting('site_tagline') }}">
-    <meta name="theme-color" content="#01411c">
+    <meta name="theme-color" content="{{ \App\Support\Theme::colors()['brand'] }}">
     <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='8' fill='%2301411c'/%3E%3Cpath d='M16 5c1 3 4 5 7 6.5V27H9V11.5C12 10 15 8 16 5Z' fill='%23ffffff'/%3E%3C/svg%3E">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
     @vite(['resources/css/app.css', 'resources/js/app.js'])
+    @if ($themeCss = \App\Support\Theme::css())<style>{!! $themeCss !!}</style>@endif
 </head>
 <body class="min-h-screen">
 <a href="#main" class="sr-only focus:not-sr-only focus:fixed focus:top-3 focus:left-3 focus:z-[100] focus:rounded-full focus:bg-lake-300 focus:px-4 focus:py-2 focus:text-slate-900">Skip to content</a>
@@ -69,6 +72,21 @@
         </nav>
 
         <div class="flex items-center gap-2">
+            @if ($switchable->count() > 1)
+                <div class="relative hidden sm:block" x-data="{ cur: false }" @click.outside="cur = false" @keydown.escape="cur = false">
+                    <button type="button" @click="cur = !cur" :aria-expanded="cur" class="inline-flex items-center gap-1.5 rounded-lg px-3 py-2 text-sm font-medium text-slate-700 ring-1 ring-slate-200 transition hover:bg-slate-50" aria-label="Change currency">
+                        <x-icon name="globe" class="size-4 text-slate-500"/>{{ $currentCurrency->code }}<x-icon name="chevron-down" class="size-3.5 text-slate-400"/>
+                    </button>
+                    <form x-cloak x-show="cur" x-transition.opacity.duration.100ms method="post" action="{{ route('currency.update') }}" class="absolute top-full right-0 mt-2 max-h-80 w-64 overflow-y-auto rounded-xl bg-white p-1.5 shadow-xl ring-1 ring-slate-200">
+                        @csrf
+                        @foreach ($switchable as $c)
+                            <button name="currency" value="{{ $c->code }}" @class(['flex w-full items-center justify-between gap-3 rounded-lg px-3 py-2 text-left text-sm transition', $c->code === $currentCurrency->code ? 'bg-brand-50 font-semibold text-brand-800' : 'text-slate-700 hover:bg-slate-50'])>
+                                <span>{{ $c->name }}</span><span class="font-mono text-xs text-slate-500">{{ $c->symbol }} {{ $c->code }}</span>
+                            </button>
+                        @endforeach
+                    </form>
+                </div>
+            @endif
             @if (setting('contact_phone_ca'))
                 <a href="tel:{{ preg_replace('/[^\d+]/', '', setting('contact_phone_ca')) }}" class="hidden text-sm font-medium text-slate-600 hover:text-slate-900 xl:inline">{{ setting('contact_phone_ca') }}</a>
             @endif
@@ -93,6 +111,17 @@
                     <a href="{{ route('packages.index', ['category' => $exp->slug]) }}" class="rounded-xl bg-slate-50 p-3 text-sm font-medium text-slate-800">{{ $exp->name }}</a>
                 @endforeach
             </div>
+            @if ($switchable->count() > 1)
+                <form method="post" action="{{ route('currency.update') }}" class="mt-6">
+                    @csrf
+                    <label for="m-currency" class="mb-2 block text-sm font-semibold text-slate-500">Currency</label>
+                    <select id="m-currency" name="currency" onchange="this.form.submit()" class="field">
+                        @foreach ($switchable as $c)
+                            <option value="{{ $c->code }}" @selected($c->code === $currentCurrency->code)>{{ $c->code }} — {{ $c->name }}</option>
+                        @endforeach
+                    </select>
+                </form>
+            @endif
             <a href="{{ route('contact') }}" class="btn btn-primary mt-6 w-full">Plan my trip</a>
         </nav>
     </div>
@@ -151,7 +180,7 @@
         </div>
         <div class="mt-12 flex flex-col gap-3 border-t border-white/10 pt-6 text-xs text-white/50 sm:flex-row sm:items-center sm:justify-between">
             <p>© {{ date('Y') }} {{ $siteName }}. All rights reserved.</p>
-            <p>Prices in USD per person, twin sharing. CAD amounts are approximate.</p>
+            <p>Prices are per person, twin sharing. Amounts converted from {{ currencies()->base()->code }} are approximate.</p>
         </div>
     </div>
 </footer>

@@ -7,6 +7,7 @@
     <title>Sign in · {{ setting('site_name', 'Safarnama') }}</title>
     <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
     @vite(['resources/css/app.css', 'resources/js/app.js'])
+    @if ($themeCss = \App\Support\Theme::css())<style>{!! $themeCss !!}</style>@endif
 </head>
 <body class="grid min-h-screen place-items-center bg-brand-950 p-4">
     <div class="w-full max-w-sm">

@@ -162,7 +162,7 @@ class SiteTest extends TestCase
     {
         $this->actingAs(User::first());
 
-        $this->put('/admin/settings', ['hero_title' => 'Discover Pakistan with us', 'cad_rate' => '1.40'])->assertSessionHas('status');
+        $this->put('/admin/settings', ['hero_title' => 'Discover Pakistan with us'])->assertSessionHas('status');
         $this->get('/')->assertSee('Discover Pakistan with us');
 
         $booking = Package::first()->bookings()->create(['full_name' => 'A', 'email' => 'a@example.com', 'adults' => 1, 'start_date' => now()->addMonth()]);

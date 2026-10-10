@@ -16,6 +16,18 @@ class BookingController extends Controller
         return round($package->price * ($adults + $children * self::CHILD_RATE), 2);
     }
 
+    /**
+     * The currency the guest was browsing in, so quotes and payments can use it.
+     *
+     * @return array{currency: string, exchange_rate: float}
+     */
+    public static function currencySnapshot(): array
+    {
+        $currency = currencies()->current();
+
+        return ['currency' => $currency->code, 'exchange_rate' => currencies()->rate($currency) ?: 1];
+    }
+
     public function store(BookingRequest $request, Package $package)
     {
         abort_unless($package->is_published, 404);
@@ -25,7 +37,7 @@ class BookingController extends Controller
 
         $booking = $package->bookings()->create($data + [
             'total_estimate' => self::estimate($package, $data['adults'], $data['children']),
-        ]);
+        ] + self::currencySnapshot());
 
         // The reference doubles as the access token for the confirmation page.
         session()->push('bookings', $booking->reference);
@@ -35,7 +47,7 @@ class BookingController extends Controller
 
     public function show(Booking $booking)
     {
-        abort_unless(in_array($booking->reference, session('bookings', []), true) || auth()->check(), 404);
+        abort_unless(PaymentController::canAccess(request(), $booking), 404);
 
         return view('bookings.show', ['booking' => $booking->load('package')]);
     }

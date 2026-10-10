@@ -13,6 +13,10 @@
         ['Reviews', 'admin.testimonials.index', 'quote', 'admin.testimonials.*'],
         ['FAQs', 'admin.faqs.index', 'help', 'admin.faqs.*'],
         ['Media library', 'admin.media.index', 'image', 'admin.media.*'],
+        null,
+        ['Currencies', 'admin.currencies.index', 'globe', 'admin.currencies.*'],
+        ['Payments', 'admin.payments.edit', 'ticket', 'admin.payments.*'],
+        ['Appearance', 'admin.appearance.edit', 'sparkle', 'admin.appearance.*'],
         ['Site content', 'admin.settings.edit', 'settings', 'admin.settings.*'],
     ];
     $pending = \App\Models\Booking::where('status', 'pending')->count();
@@ -30,6 +34,7 @@
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
     @vite(['resources/css/app.css', 'resources/js/app.js'])
+    @if ($themeCss = \App\Support\Theme::css())<style>{!! $themeCss !!}</style>@endif
 </head>
 <body class="bg-slate-100" x-data="{ nav: false }">
 <div class="min-h-screen lg:grid lg:grid-cols-[16rem_1fr]">

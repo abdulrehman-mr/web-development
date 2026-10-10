@@ -32,6 +32,40 @@
                     <div class="mt-5 rounded-xl bg-white p-4 text-sm"><p class="mb-1 text-xs text-ink/50">Special requests</p><p class="whitespace-pre-line">{{ $booking->special_requests }}</p></div>
                 @endif
             </x-admin.card>
+            <x-admin.card title="Payments" x-data="{ copied: false }">
+                <dl class="grid grid-cols-3 gap-3 text-sm">
+                    <div class="rounded-xl bg-slate-50 p-3"><dt class="text-xs text-slate-500">Total ({{ currencies()->base()->code }})</dt><dd class="mt-1 font-semibold">{{ money_base($booking->total_estimate) }}</dd></div>
+                    <div class="rounded-xl bg-slate-50 p-3"><dt class="text-xs text-slate-500">Paid</dt><dd class="mt-1 font-semibold text-brand-700">{{ money_base($booking->amount_paid) }}</dd></div>
+                    <div class="rounded-xl bg-slate-50 p-3"><dt class="text-xs text-slate-500">Balance</dt><dd class="mt-1 font-semibold">{{ money_base($booking->balanceDue()) }}</dd></div>
+                </dl>
+                @if ($booking->currency && $booking->currency !== currencies()->base()->code)
+                    <p class="mt-3 text-xs text-slate-500">Guest was browsing in {{ $booking->currency }}: total ≈ {{ format_money($booking->total_estimate * $booking->exchange_rate, $booking->currency) }} at the rate on the booking date.</p>
+                @endif
+                @if ($booking->payments->isNotEmpty())
+                    <div class="-mx-5 mt-4 overflow-x-auto sm:-mx-6">
+                        <table class="w-full min-w-[32rem] text-left text-sm">
+                            <thead class="text-xs text-slate-500"><tr><th class="px-5 py-2 font-medium sm:px-6">Date</th><th class="py-2 font-medium">Method</th><th class="py-2 font-medium">Amount</th><th class="py-2 font-medium">Status</th><th class="py-2 pr-5 font-medium">Provider ref.</th></tr></thead>
+                            <tbody class="divide-y divide-slate-100">
+                                @foreach ($booking->payments as $p)
+                                    <tr>
+                                        <td class="px-5 py-2 sm:px-6">{{ $p->created_at->format('j M Y, H:i') }}</td>
+                                        <td class="py-2">{{ app(\App\Support\Payments\PaymentGateways::class)->find($p->gateway)?->name() ?? $p->gateway }} · {{ $p->type }}</td>
+                                        <td class="py-2 font-medium">{{ $p->formattedAmount() }}</td>
+                                        <td class="py-2"><span @class(['rounded-md px-2 py-0.5 text-xs font-semibold capitalize', 'bg-brand-100 text-brand-800' => $p->status === 'paid', 'bg-slate-100 text-slate-600' => in_array($p->status, ['pending', 'cancelled']), 'bg-rose-100 text-rose-700' => $p->status === 'failed'])>{{ $p->status }}</span>@if ($p->failure_reason)<span class="block text-xs text-slate-400">{{ Str::limit($p->failure_reason, 60) }}</span>@endif</td>
+                                        <td class="py-2 pr-5 font-mono text-xs text-slate-500">{{ $p->gateway_reference ?? '—' }}</td>
+                                    </tr>
+                                @endforeach
+                            </tbody>
+                        </table>
+                    </div>
+                @endif
+                @php $link = \App\Http\Controllers\PaymentController::payLink($booking); @endphp
+                <div class="mt-4 flex flex-wrap gap-2">
+                    <button type="button" class="btn btn-ghost py-2" @click="navigator.clipboard.writeText(@js($link)); copied = true; setTimeout(() => copied = false, 1500)"><x-icon name="external" class="size-4"/><span x-text="copied ? 'Link copied' : 'Copy payment link'">Copy payment link</span></button>
+                    <a href="mailto:{{ $booking->email }}?subject={{ rawurlencode('Payment for your journey ('.$booking->reference.')') }}&body={{ rawurlencode("Hello {$booking->full_name},\n\nYou can pay securely for your journey here:\n{$link}\n\nThank you!") }}" class="btn btn-ghost py-2"><x-icon name="mail" class="size-4"/>Email link to guest</a>
+                </div>
+                <p class="mt-2 text-xs text-slate-500">The link is valid for 30 days.</p>
+            </x-admin.card>
         </div>
 
         <form method="post" action="{{ route('admin.bookings.update', $booking) }}">
@@ -49,7 +83,7 @@
                             @endforeach
                         </div>
                     </div>
-                    <x-admin.input name="total_estimate" type="number" step="1" label="Quoted total (USD)" :value="$booking->total_estimate"/>
+                    <x-admin.input name="total_estimate" type="number" step="1" :label="'Quoted total ('.currencies()->base()->code.')'" :value="$booking->total_estimate"/>
                     <x-admin.textarea name="admin_notes" label="Internal notes" :value="$booking->admin_notes" rows="5" help="Only visible to your team."/>
                     <button class="btn btn-primary w-full">Update booking</button>
                     <p class="text-center text-xs text-ink/40">Received {{ $booking->created_at->format('j M Y, g:ia') }}</p>

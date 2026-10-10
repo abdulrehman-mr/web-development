@@ -24,7 +24,7 @@ class SettingController extends Controller
                 $rules += $type === 'image' ? $this->imageRules($key) : [$key => 'nullable|string|max:10000'];
             }
         }
-        $request->validate($rules + ['cad_rate' => 'nullable|numeric|min:0']);
+        $request->validate($rules);
 
         foreach (Setting::SCHEMA as $fields) {
             foreach ($fields as $key => [, $type]) {

@@ -21,7 +21,10 @@ A premium, responsive travel website for a Pakistan tour operator that serves gu
 - **Destinations**, **Stays (hotels)**, **Experiences (categories)**, **Reviews**, **FAQs:** add, edit and delete
 - **Bookings:** filter by status, search, change status, add a quoted total and internal notes, and email or WhatsApp the guest
 - **Enquiries** inbox with read/unread state
-- **Site content:** hero text and image, story, stats, about page, contact details, USD→CAD rate, social links and logo
+- **Site content:** hero text and image, story, stats, about page, contact details, social links and logo
+- **Currencies:** all 166 ISO 4217 currencies. Choose which currency prices are entered in (the base), the default currency for visitors and an optional "about CA$…" second price. Enable the currencies visitors can switch to, and edit each symbol and its position. Exchange rates update daily, from the "Update rates now" button, or by hand.
+- **Payments:** Stripe, PayPal, Authorize.net, 2Checkout and CoinPayments, each with on/off, test/live mode and encrypted keys. Set the deposit percentage, then copy or email a secure payment link from any booking.
+- **Appearance:** six colour schemes (Pakistan Green, Indus Blue, Karakoram Teal, Truck Art Red, Royal Violet, Midnight Slate) or your own two colours, with a live preview
 
 **JSON API** (`/api/v1`)
 | Method | Endpoint | |
@@ -36,6 +39,23 @@ A premium, responsive travel website for a Pakistan tour operator that serves gu
 | POST | `/inquiries` | `name`, `email`, `message`, … |
 
 The POST endpoints are rate-limited.
+
+## Payments
+
+Guests request a journey, then pay a deposit or the full amount on `/booking/{reference}/pay`. Every provider uses its own hosted checkout, so card details never reach this server. A payment is only marked paid after the server confirms it: Stripe and PayPal through their APIs on return, and every provider through its signed webhook.
+
+| Provider | Checkout | Confirmation | Currency |
+|---|---|---|---|
+| Stripe | Checkout Session | API lookup on return + `checkout.session.*` webhook | Guest's currency |
+| PayPal | Orders v2 | Capture on return (+ optional verified webhook) | Guest's currency if PayPal supports it, otherwise the base currency |
+| Authorize.net | Accept Hosted form | Signed webhook + `getTransactionDetails` | Your merchant account currency |
+| 2Checkout | Signed ConvertPlus buy link | Signed IPN | Guest's currency |
+| CoinPayments | Simple checkout (guest picks the coin) | HMAC-signed IPN | Guest's currency |
+
+Paste each provider's webhook URL from **Admin → Payments** into that provider's dashboard. **Test every provider in its sandbox before going live.** The integrations are covered by automated tests against mocked APIs, but they have not been run against the real provider services.
+
+Exchange rates update daily through Laravel's scheduler, so add the standard cron entry on your server:
+`* * * * * cd /path/to/app && php artisan schedule:run >> /dev/null 2>&1`
 
 ## Getting started
 

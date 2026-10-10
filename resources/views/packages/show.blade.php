@@ -1,7 +1,9 @@
 <x-site-layout :title="$package->title" :description="$package->summary">
     @php
         $stays = $package->stays();
-        $rate = (float) setting('cad_rate');
+        $display = currencies()->current();
+        $displayRate = currencies()->rate($display) ?: 1;
+        $secondary = currencies()->secondary();
         $childRate = \App\Http\Controllers\BookingController::CHILD_RATE;
     @endphp
 
@@ -192,9 +194,11 @@
         {{-- Booking panel --}}
         <aside class="min-w-0 lg:col-span-5 xl:col-span-4" id="book">
             <div class="lg:sticky lg:top-24"
-                 x-data="{ adults: {{ (int) old('adults', 2) }}, children: {{ (int) old('children', 0) }}, price: {{ (float) $package->price }}, rate: {{ $rate }}, childRate: {{ $childRate }},
-                           get total() { return Math.round(this.price * (this.adults + this.children * this.childRate)) },
-                           fmt(n) { return n.toLocaleString('en-US', { maximumFractionDigits: 0 }) } }">
+                 x-data="{ adults: {{ (int) old('adults', 2) }}, children: {{ (int) old('children', 0) }}, price: {{ (float) $package->price }}, childRate: {{ $childRate }},
+                           rate: {{ $displayRate }}, symbol: @js($display->symbol), after: {{ $display->symbol_position === 'after' ? 'true' : 'false' }},
+                           secondaryRate: {{ $secondary ? currencies()->rate($secondary) : 0 }}, secondarySymbol: @js($secondary?->symbol),
+                           get total() { return this.price * (this.adults + this.children * this.childRate) },
+                           fmt(n, symbol, after) { const v = Math.round(n).toLocaleString('en-US'); return after ? v + ' ' + symbol : symbol + v } }}">
                 <div class="rounded-3xl bg-white p-6 shadow-[0_30px_80px_-40px_rgb(8_26_22/0.45)] ring-1 ring-slate-200 sm:p-8">
                     <p class="text-xs font-medium text-ink/50">From</p>
                     <x-price :amount="$package->price" :original="$package->original_price" size="lg"/>
@@ -257,9 +261,9 @@
                         <div class="rounded-2xl bg-slate-100 p-4">
                             <div class="flex items-baseline justify-between">
                                 <span class="text-sm text-ink/70">Estimated total</span>
-                                <span class="text-3xl font-bold tracking-tight text-slate-900">$<span x-text="fmt(total)"></span></span>
+                                <span class="text-3xl font-bold tracking-tight text-slate-900" x-text="fmt(total * rate, symbol, after)">{{ money($package->price * 2) }}</span>
                             </div>
-                            <p class="mt-1 text-right text-xs text-ink/50" x-show="rate > 0">≈ CA$<span x-text="fmt(Math.round(total * rate))"></span></p>
+                            <p class="mt-1 text-right text-xs text-ink/50" x-show="secondaryRate > 0" x-text="'about ' + fmt(total * secondaryRate, secondarySymbol, false)"></p>
                         </div>
 
                         <button class="btn btn-primary w-full py-4 text-base">Request this journey</button>
