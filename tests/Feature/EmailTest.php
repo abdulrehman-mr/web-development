@@ -179,4 +179,20 @@ class EmailTest extends TestCase
         $this->put('/admin/email', ['mail_driver' => 'smtp', 'mail_from_address' => 'a@b.co', 'mail_from_name' => 'X'])
             ->assertSessionHasErrors(['mail_host', 'mail_port']);
     }
+
+    public function test_email_uses_admin_settings_never_mail_env_variables(): void
+    {
+        Setting::whereIn('key', ['mail_driver', 'mail_from_address', 'mail_from_name'])->delete();
+        Setting::put(['contact_email' => 'hello@safarnama.travel']);
+        putenv('MAIL_MAILER=smtp');
+        putenv('MAIL_FROM_ADDRESS=env@example.com');
+
+        MailSettings::apply();
+
+        $this->assertSame('php', config('mail.default'));
+        $this->assertSame('hello@safarnama.travel', config('mail.from.address'));
+        $this->assertSame('Safarnama', config('mail.from.name'));
+        putenv('MAIL_MAILER');
+        putenv('MAIL_FROM_ADDRESS');
+    }
 }

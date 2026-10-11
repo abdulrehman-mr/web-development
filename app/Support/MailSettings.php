@@ -9,7 +9,8 @@ use Symfony\Component\Mailer\Transport\NativeTransportFactory;
 
 /**
  * Applies the email settings from Admin → Email to Laravel's mailer at runtime.
- * Until a sending method is chosen in the admin, the .env MAIL_* values apply.
+ * Email never reads MAIL_* environment variables: until something is saved in the
+ * admin, it sends with PHP mail from the site's contact email.
  */
 class MailSettings
 {
@@ -29,9 +30,9 @@ class MailSettings
 
     public static function apply(): void
     {
-        $driver = setting('mail_driver');
+        $driver = setting('mail_driver', 'php');
         if (! array_key_exists((string) $driver, self::DRIVERS)) {
-            return;
+            $driver = 'php';
         }
 
         config([
@@ -42,8 +43,8 @@ class MailSettings
             'mail.mailers.smtp.port' => (int) setting('mail_port', 587),
             'mail.mailers.smtp.username' => setting('mail_username'),
             'mail.mailers.smtp.password' => Setting::secret('mail_password'),
-            'mail.from.address' => setting('mail_from_address', config('mail.from.address')),
-            'mail.from.name' => setting('mail_from_name', setting('site_name', config('mail.from.name'))),
+            'mail.from.address' => setting('mail_from_address') ?: setting('contact_email') ?: 'noreply@'.(parse_url((string) config('app.url'), PHP_URL_HOST) ?: 'localhost'),
+            'mail.from.name' => setting('mail_from_name') ?: setting('site_name') ?: config('app.name'),
         ]);
 
         Mail::purge($driver);

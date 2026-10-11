@@ -28,7 +28,7 @@ class AppServiceProvider extends ServiceProvider
         try {
             MailSettings::apply();
         } catch (Throwable) {
-            // Fall back to the MAIL_* values from .env.
+            // No database yet (fresh install or build step): config/mail.php defaults to PHP mail.
         }
     }
 }

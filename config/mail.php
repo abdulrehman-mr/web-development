@@ -14,7 +14,9 @@ return [
     |
     */
 
-    'default' => env('MAIL_MAILER', 'log'),
+    // Email is configured in Admin → Email settings (App\Support\MailSettings applies it at runtime).
+    // These are only the defaults before anything has been saved there.
+    'default' => 'php',
 
     /*
     |--------------------------------------------------------------------------
@@ -37,16 +39,21 @@ return [
 
     'mailers' => [
 
+        // "PHP mail": the server's sendmail, as used by PHP's mail() (registered in MailSettings).
+        'php' => [
+            'transport' => 'native',
+        ],
+
         'smtp' => [
             'transport' => 'smtp',
-            'scheme' => env('MAIL_SCHEME'),
-            'url' => env('MAIL_URL'),
-            'host' => env('MAIL_HOST', '127.0.0.1'),
-            'port' => env('MAIL_PORT', 2525),
-            'username' => env('MAIL_USERNAME'),
-            'password' => env('MAIL_PASSWORD'),
+            'scheme' => 'smtp',
+            'url' => null,
+            'host' => null,
+            'port' => 587,
+            'username' => null,
+            'password' => null,
             'timeout' => null,
-            'local_domain' => env('MAIL_EHLO_DOMAIN', parse_url((string) env('APP_URL', 'http://localhost'), PHP_URL_HOST)),
+            'local_domain' => parse_url((string) env('APP_URL', 'http://localhost'), PHP_URL_HOST),
         ],
 
         'ses' => [
@@ -67,12 +74,12 @@ return [
 
         'sendmail' => [
             'transport' => 'sendmail',
-            'path' => env('MAIL_SENDMAIL_PATH', '/usr/sbin/sendmail -bs -i'),
+            'path' => '/usr/sbin/sendmail -bs -i',
         ],
 
         'log' => [
             'transport' => 'log',
-            'channel' => env('MAIL_LOG_CHANNEL'),
+            'channel' => null,
         ],
 
         'array' => [
@@ -111,8 +118,8 @@ return [
     */
 
     'from' => [
-        'address' => env('MAIL_FROM_ADDRESS', 'hello@example.com'),
-        'name' => env('MAIL_FROM_NAME', env('APP_NAME', 'Laravel')),
+        'address' => 'hello@example.com',
+        'name' => env('APP_NAME', 'Laravel'),
     ],
 
 ];
