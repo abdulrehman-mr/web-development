@@ -9,6 +9,7 @@ use App\Models\MediaAsset;
 use App\Models\Package;
 use App\Models\Setting;
 use Illuminate\Http\Client\ConnectionException;
+use Illuminate\Http\Client\PendingRequest;
 use Illuminate\Http\Client\RequestException;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Storage;
@@ -61,7 +62,7 @@ class ImageImporter
 
         foreach ($this->imageFields() as [$model, $column]) {
             foreach ((array) $model->{$column} as $value) {
-                if (MediaAsset::isRemote($value)) {
+                if (MediaAsset::isImportable($value)) {
                     MediaAsset::register($value);
                 }
             }
@@ -90,11 +91,14 @@ class ImageImporter
         $asset->increment('attempts');
 
         try {
-            $response = Http::withUserAgent(config('app.name').'-ImageImporter/1.0 (+'.config('app.url').')')
+            $url = MediaAsset::isWikiReference($asset->source_url)
+                ? $this->resolveWikipediaImage(substr($asset->source_url, 5))
+                : $asset->source_url;
+
+            $response = $this->http()
                 ->accept('image/*')
                 ->timeout(60)
-                ->retry(2, 1000, fn ($e) => $e instanceof ConnectionException || ($e instanceof RequestException && $e->response->serverError()), throw: false)
-                ->get($asset->source_url);
+                ->get($url);
 
             if (! $response->successful()) {
                 throw new \RuntimeException('HTTP '.$response->status());
@@ -125,6 +129,31 @@ class ImageImporter
 
             return false;
         }
+    }
+
+    private function http(): PendingRequest
+    {
+        // Wikimedia asks automated clients to identify themselves.
+        return Http::withUserAgent(config('app.name').'-ImageImporter/1.0 (+'.config('app.url').')')
+            ->connectTimeout(10)
+            ->retry(2, 1000, fn ($e) => $e instanceof ConnectionException || ($e instanceof RequestException && $e->response->serverError()), throw: false);
+    }
+
+    /** The main image of an English Wikipedia article, at 1600px wide. */
+    public function resolveWikipediaImage(string $title): string
+    {
+        $response = $this->http()->timeout(20)->get('https://en.wikipedia.org/w/api.php', [
+            'action' => 'query', 'format' => 'json', 'formatversion' => 2, 'redirects' => 1,
+            'prop' => 'pageimages', 'piprop' => 'thumbnail|original', 'pithumbsize' => 1600, 'titles' => $title,
+        ]);
+
+        $page = $response->json('query.pages.0') ?? [];
+        $url = $page['thumbnail']['source'] ?? $page['original']['source'] ?? null;
+        if (! $response->successful() || ! $url) {
+            throw new \RuntimeException("Wikipedia has no main image for “{$title}”");
+        }
+
+        return $url;
     }
 
     /** Replace remote URLs in site content with local paths of imported assets. Returns fields changed. */

@@ -215,6 +215,7 @@ class TravelSeeder extends Seeder
         foreach ($packages as $i => $p) {
             $package = Package::create([
                 'category_id' => $categories[$p['category']]->id,
+                'country' => 'PK',
                 'title' => $p['title'], 'slug' => Str::slug($p['title']),
                 'summary' => $p['summary'], 'overview' => $p['overview'],
                 'duration_days' => $p['days'], 'price' => $p['price'], 'original_price' => $p['original'],

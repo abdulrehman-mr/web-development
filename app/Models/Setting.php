@@ -35,6 +35,10 @@ class Setting extends Model
             'hero_subtitle' => ['Intro paragraph', 'textarea', null],
             'hero_image' => ['Background image', 'image', 'Wide landscape photo, at least 2000px.'],
         ],
+        'Home sections' => [
+            'home_experiences_title' => ['Experiences heading', 'text', 'e.g. “Six ways to discover Pakistan”.'],
+            'home_destinations_title' => ['Destinations heading', 'text', 'e.g. “From the Arabian Sea to the Karakoram”.'],
+        ],
         'Home story' => [
             'story_title' => ['Story heading', 'text', null],
             'story_body' => ['Story paragraph', 'textarea', null],

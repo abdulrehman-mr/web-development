@@ -28,6 +28,13 @@
                     <div><dt class="text-xs text-ink/50">Travellers</dt><dd class="mt-0.5 font-medium">{{ $booking->adults }} adults, {{ $booking->children }} children</dd></div>
                     <div><dt class="text-xs text-ink/50">Room</dt><dd class="mt-0.5 font-medium">{{ $booking->room_preference ?: '—' }}</dd></div>
                 </dl>
+                @if (! empty($booking->options))
+                    <dl class="mt-4 grid gap-2 text-sm sm:grid-cols-2">
+                        @foreach ($booking->options as $choice)
+                            <div><dt class="text-xs text-ink/50">{{ $choice['group'] }}</dt><dd class="mt-0.5 font-medium">{{ $choice['label'] }}</dd></div>
+                        @endforeach
+                    </dl>
+                @endif
                 @if (! empty($booking->extras))
                     <div class="mt-4 text-sm"><p class="text-xs text-ink/50">Extras</p>
                         <ul class="mt-1 list-inside list-disc">@foreach ($booking->extras as $extra)<li>{{ $extra['name'] }} <span class="text-slate-500">({{ money_base($extra['price']) }} {{ $extra['per'] === 'person' ? 'per person' : 'per booking' }})</span></li>@endforeach</ul>

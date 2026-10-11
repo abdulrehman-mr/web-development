@@ -9,7 +9,7 @@ class Hotel extends Model
 {
     public const TYPES = ['Heritage hotel', 'Luxury hotel', 'Boutique hotel', 'Mountain lodge', 'Desert camp', 'Beach resort', 'Guesthouse'];
 
-    protected $fillable = ['destination_id', 'name', 'slug', 'type', 'stars', 'description', 'image', 'amenities', 'address'];
+    protected $fillable = ['destination_id', 'pack', 'name', 'slug', 'type', 'stars', 'description', 'image', 'amenities', 'address'];
 
     protected function casts(): array
     {

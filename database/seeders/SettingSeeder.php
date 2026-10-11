@@ -37,6 +37,8 @@ class SettingSeeder extends Seeder
             'currency_switcher' => '1',
             'deposit_percent' => '25',
             'theme_preset' => 'pakistan',
+            'home_experiences_title' => 'Six ways to discover Pakistan',
+            'home_destinations_title' => 'From the Arabian Sea to the Karakoram',
             'mail_enabled' => '1',
             'mail_driver' => 'php',
             'mail_from_name' => 'Safarnama',

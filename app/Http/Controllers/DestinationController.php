@@ -10,8 +10,13 @@ class DestinationController extends Controller
     {
         $destinations = Destination::withCount(['packages' => fn ($q) => $q->published()])->orderBy('sort_order')->get();
 
+        $multipleCountries = $destinations->pluck('country')->unique()->count() > 1;
+
         return view('destinations.index', [
-            'regions' => $destinations->groupBy('region'),
+            'regions' => $multipleCountries
+                ? $destinations->groupBy('country_name')->sortKeys()
+                : $destinations->groupBy(fn ($d) => $d->region ?: $d->country_name),
+            'multipleCountries' => $multipleCountries,
             'count' => $destinations->count(),
         ]);
     }
@@ -22,7 +27,8 @@ class DestinationController extends Controller
 
         return view('destinations.show', [
             'destination' => $destination,
-            'nearby' => Destination::where('region', $destination->region)->where('id', '!=', $destination->id)->take(3)->get(),
+            'nearby' => Destination::where('country', $destination->country)->where('id', '!=', $destination->id)
+                ->orderByRaw('region = ? desc', [$destination->region])->take(3)->get(),
         ]);
     }
 }

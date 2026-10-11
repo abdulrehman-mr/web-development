@@ -1,0 +1,166 @@
+<?php
+
+/*
+ * Content pack: South Korea.
+ * Import from Admin → Content packs. Prices are in USD and converted to your base currency on import.
+ * Images are Wikipedia article references (wiki:Title) downloaded by the image importer.
+ * Hotels, prices and itineraries are sample content: review them before selling.
+ */
+
+return [
+    'key' => 'south-korea',
+    'name' => 'South Korea',
+    'country' => 'KR',
+    'currency' => 'KRW',
+    'cover' => 'wiki:Gyeongbokgung',
+    'summary' => 'Palaces and K-culture in Seoul, temples in Gyeongju, Busan’s coast and Jeju Island.',
+    'destinations' => [
+        [
+            'name' => 'Seoul',
+            'region' => 'Seoul Capital Area',
+            'tagline' => 'Palaces, K-pop and the future',
+            'description' => 'A city where Joseon palaces sit beside glass towers, with some of the world’s fastest internet and best street food.',
+            'highlights' => ['Gyeongbokgung Palace', 'Bukchon Hanok Village', 'Gangnam and COEX', 'Lotte World Tower'],
+            'best_season' => 'Apr – May, Sep – Nov',
+            'image' => 'wiki:Gyeongbokgung',
+            'featured' => true,
+        ],
+        [
+            'name' => 'Gyeongju',
+            'region' => 'North Gyeongsang',
+            'tagline' => 'The museum without walls',
+            'description' => 'The ancient Silla capital, full of royal tombs, temples and stone pagodas.',
+            'highlights' => ['Bulguksa Temple', 'Seokguram Grotto', 'Royal tombs'],
+            'best_season' => 'Apr – May, Sep – Nov',
+            'image' => 'wiki:Bulguksa',
+        ],
+        [
+            'name' => 'Busan',
+            'region' => 'South Gyeongsang',
+            'tagline' => 'Beaches and seafood markets',
+            'description' => 'Korea’s second city, with beaches, hillside villages and the giant Jagalchi fish market.',
+            'highlights' => ['Haeundae Beach', 'Gamcheon Culture Village', 'Jagalchi Market'],
+            'best_season' => 'May – Oct',
+            'image' => 'wiki:Gamcheon Culture Village',
+        ],
+        [
+            'name' => 'Jeju Island',
+            'region' => 'Jeju',
+            'tagline' => 'Volcanic island of waterfalls and tangerines',
+            'description' => 'A volcanic island with lava tubes, waterfalls and the famous haenyeo women divers.',
+            'highlights' => ['Seongsan Ilchulbong', 'Manjanggul lava tube', 'Haenyeo divers'],
+            'best_season' => 'Apr – Oct',
+            'image' => 'wiki:Jeju Island',
+            'featured' => true,
+        ],
+    ],
+    'hotels' => [
+        [
+            'name' => 'Signiel Seoul',
+            'destination' => 'Seoul',
+            'type' => 'Luxury hotel',
+            'stars' => 5,
+            'description' => 'On floors 76–101 of Lotte World Tower, with the city spread out below.',
+            'address' => 'Lotte World Tower, Songpa-gu, Seoul',
+            'amenities' => ['Sky-high views', 'Spa', 'Michelin dining'],
+        ],
+        [
+            'name' => 'Park Hyatt Busan',
+            'destination' => 'Busan',
+            'type' => 'Luxury hotel',
+            'stars' => 5,
+            'description' => 'Floor-to-ceiling views over the Marine City marina.',
+            'address' => 'Haeundae-gu, Busan',
+            'amenities' => ['Marina views', 'Spa'],
+        ],
+        [
+            'name' => 'Lotte Hotel Jeju',
+            'destination' => 'Jeju Island',
+            'type' => 'Beach resort',
+            'stars' => 5,
+            'description' => 'A resort on Jungmun Beach with a nightly volcano fountain show.',
+            'address' => 'Jungmun Tourist Complex, Jeju',
+            'amenities' => ['Pools', 'Kids’ club', 'Beach'],
+        ],
+    ],
+    'packages' => [
+        [
+            'title' => 'Seoul Tech & K-Culture',
+            'category' => 'City breaks',
+            'category_tagline' => 'Skylines, food and neighbourhoods',
+            'vibes' => ['Tech-savvy', 'City breaks', 'Shopping'],
+            'featured' => true,
+            'summary' => 'Six days of palaces, Gangnam, the DMZ, gadgets in Yongsan and a K-pop dance class.',
+            'overview' => 'For travellers who love what’s next: robot cafés, the electronics markets of Yongsan, a K-pop class in Gangnam and the view from the 123rd floor of Lotte World Tower, balanced with Seoul’s palaces and markets.',
+            'price' => 1890,
+            'child_price' => 1290,
+            'start_city' => 'Seoul',
+            'best_season' => 'Apr – May, Sep – Nov',
+            'image' => 'wiki:Lotte World Tower',
+            'destinations' => ['Seoul'],
+            'highlights' => ['Seoul Sky observatory', 'K-pop dance class', 'Yongsan Electronics Market', 'DMZ day trip'],
+            'extras' => [
+                [
+                    'name' => 'Hanbok rental for the palaces',
+                    'description' => 'Wear traditional dress and enter palaces free.',
+                    'price' => 35,
+                    'per' => 'person',
+                ],
+            ],
+            'itinerary' => [
+                ['Arrival in Seoul', 'Airport welcome and transfer.', 'Signiel Seoul', 'Dinner'],
+                ['Joseon Seoul', 'Gyeongbokgung, Bukchon Hanok Village and Insadong.', 'Signiel Seoul', 'Breakfast'],
+                [
+                    'Future Seoul',
+                    'Gangnam, COEX Starfield Library and a K-pop dance class; Seoul Sky at night.',
+                    'Signiel Seoul',
+                    'Breakfast',
+                ],
+                ['DMZ', 'Guided day trip to the Demilitarised Zone.', 'Signiel Seoul', 'Breakfast, Lunch'],
+                [
+                    'Gadgets and markets',
+                    'Yongsan Electronics Market, Hongdae and Gwangjang Market.',
+                    'Signiel Seoul',
+                    'Breakfast',
+                ],
+                ['Departure', 'Transfer to Incheon airport.', null, 'Breakfast'],
+            ],
+        ],
+        [
+            'title' => 'Korea Highlights: Seoul, Gyeongju, Busan & Jeju',
+            'category' => 'Heritage & culture',
+            'vibes' => ['Heritage & history', 'Nature & wildlife', 'Food & culture'],
+            'summary' => 'Ten days by bullet train and short flight across Korea’s cities, temples and volcanic island.',
+            'overview' => 'KTX bullet trains link Seoul, Gyeongju and Busan, and a short flight takes you to Jeju for the finale.',
+            'price' => 2790,
+            'tiers' => [
+                [
+                    'min' => 6,
+                    'price' => 2590,
+                ],
+            ],
+            'start_city' => 'Seoul',
+            'best_season' => 'Apr – May, Sep – Nov',
+            'image' => 'wiki:Bulguksa',
+            'destinations' => ['Seoul', 'Gyeongju', 'Busan', 'Jeju Island'],
+            'highlights' => [
+                'Bulguksa and Seokguram',
+                'Gamcheon Culture Village',
+                'Jagalchi fish market',
+                'Sunrise on Seongsan Ilchulbong',
+            ],
+            'itinerary' => [
+                ['Arrival in Seoul', 'Airport welcome.', 'Signiel Seoul', 'Dinner'],
+                ['Seoul', 'Palaces and Bukchon.', 'Signiel Seoul', 'Breakfast'],
+                ['Seoul', 'Markets and N Seoul Tower.', 'Signiel Seoul', 'Breakfast'],
+                ['KTX to Gyeongju', 'Royal tombs and Donggung Palace at night.', null, 'Breakfast, Dinner'],
+                ['Bulguksa', 'Bulguksa Temple and Seokguram Grotto, then on to Busan.', 'Park Hyatt Busan', 'Breakfast'],
+                ['Busan', 'Gamcheon Village and Jagalchi Market.', 'Park Hyatt Busan', 'Breakfast'],
+                ['Fly to Jeju', 'Coastal drive and Jungmun Beach.', 'Lotte Hotel Jeju', 'Breakfast'],
+                ['Jeju', 'Seongsan Ilchulbong at sunrise and the haenyeo divers.', 'Lotte Hotel Jeju', 'Breakfast'],
+                ['Jeju', 'Manjanggul lava tube and waterfalls.', 'Lotte Hotel Jeju', 'Breakfast'],
+                ['Departure', 'Fly to Seoul for your connection.', null, 'Breakfast'],
+            ],
+        ],
+    ],
+];

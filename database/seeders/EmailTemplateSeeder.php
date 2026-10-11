@@ -26,7 +26,7 @@ class EmailTemplateSeeder extends Seeder
             'description' => 'Sent to your notification address when a guest requests a journey.',
             'audience' => 'admin',
             'subject' => 'New booking {booking_reference}: {journey}',
-            'body' => "**{guest_name}** ({guest_email}, {guest_country}) requested **{journey}**.\n\n- Start date: {start_date}\n- Travellers: {travellers}\n- Room: {room}\n- Extras: {extras}\n- Estimated total: {total}\n\nSpecial requests:\n\n> {special_requests}\n\n[[Open in admin|{admin_link}]]",
+            'body' => "**{guest_name}** ({guest_email}, {guest_country}) requested **{journey}**.\n\n- Start date: {start_date}\n- Travellers: {travellers}\n- Room: {room}\n- Options: {options}\n- Extras: {extras}\n- Estimated total: {total}\n\nSpecial requests:\n\n> {special_requests}\n\n[[Open in admin|{admin_link}]]",
         ],
         'booking_confirmed_guest' => [
             'name' => 'Booking confirmed',

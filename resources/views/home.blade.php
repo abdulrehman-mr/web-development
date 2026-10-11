@@ -23,7 +23,12 @@
                     <p class="mb-4 flex items-center gap-2 text-sm font-semibold text-slate-900"><x-icon name="search" class="size-4 text-brand-600"/>Find your journey</p>
                     <div class="grid gap-3 sm:grid-cols-3">
                         <x-select-field name="category" label="Experience" icon="sparkle" placeholder="Any experience" :options="$categories->pluck('name', 'slug')"/>
-                        <x-select-field name="destination" label="Destination" icon="map-pin" placeholder="Anywhere" :options="$searchDestinations->pluck('name', 'slug')"/>
+                        @php
+                            $whereOptions = $searchDestinations->count() > 1
+                                ? $searchDestinations->flatMap(fn ($group, $country) => ['country:'.$group->first()->country => 'Anywhere in '.$country] + $group->mapWithKeys(fn ($d) => [$d->slug => "\u{00A0}\u{00A0}\u{00A0}".$d->name])->all())->all()
+                                : $searchDestinations->flatten()->pluck('name', 'slug')->all();
+                        @endphp
+                        <x-select-field name="where" label="Where" icon="map-pin" placeholder="Anywhere" :options="$whereOptions"/>
                         <x-select-field name="duration" label="Trip length" icon="clock" placeholder="Any length" :options="['short' => 'Up to 6 days', 'medium' => '7 – 9 days', 'long' => '10 days or more']"/>
                     </div>
                     <button class="btn btn-primary mt-4 w-full py-3.5"><x-icon name="search" class="size-4.5"/>Search journeys</button>
@@ -58,7 +63,7 @@
     <section class="pt-14 pb-16 sm:py-24">
         <div class="container-x">
             <div class="flex flex-col justify-between gap-4 sm:flex-row sm:items-end">
-                <x-section-heading title="Six ways to discover Pakistan" intro="Every journey is private and can be tailored around your dates, pace and family."/>
+                <x-section-heading :title="setting('home_experiences_title', 'Choose your kind of journey')" intro="Every journey is private and can be tailored around your dates, pace and family."/>
                 <a href="{{ route('packages.index') }}" class="shrink-0 text-sm font-semibold text-brand-700 hover:text-brand-800 hover:underline">See all journeys</a>
             </div>
 
@@ -77,6 +82,26 @@
             </div>
         </div>
     </section>
+
+    {{-- ── Vibes ── --}}
+    @if ($vibes->isNotEmpty())
+        <section class="pb-16 sm:pb-24">
+            <div class="container-x">
+                <x-section-heading title="Find your travel vibe" intro="Romantic escapes, pilgrimages, heritage trails or futuristic cities: start with how you want to feel."/>
+                <div class="mt-8 grid grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-5">
+                    @foreach ($vibes as $vibe)
+                        <a href="{{ route('packages.index', ['vibe' => $vibe->slug]) }}" class="group flex items-center gap-3 rounded-2xl bg-white p-4 ring-1 ring-slate-200 transition hover:-translate-y-0.5 hover:ring-brand-300 hover:shadow-md" data-reveal>
+                            <span class="grid size-11 shrink-0 place-items-center rounded-xl bg-brand-50 text-brand-700 transition group-hover:bg-brand-700 group-hover:text-white"><x-icon :name="$vibe->icon" class="size-5.5"/></span>
+                            <span class="min-w-0">
+                                <span class="block truncate text-sm font-semibold text-slate-900">{{ $vibe->name }}</span>
+                                <span class="block text-xs text-slate-500">{{ $vibe->packages_count }} {{ Str::plural('journey', $vibe->packages_count) }}</span>
+                            </span>
+                        </a>
+                    @endforeach
+                </div>
+            </div>
+        </section>
+    @endif
 
     {{-- ── Featured journeys ── --}}
     <section class="pb-16 sm:pb-24">
@@ -120,7 +145,7 @@
     <section class="py-16 sm:py-24">
         <div class="container-x">
             <div class="flex flex-col justify-between gap-4 sm:flex-row sm:items-end">
-                <x-section-heading title="From the Arabian Sea to the Karakoram"/>
+                <x-section-heading :title="setting('home_destinations_title', 'Destinations we love')"/>
                 <a href="{{ route('destinations.index') }}" class="shrink-0 text-sm font-semibold text-brand-700 hover:text-brand-800 hover:underline">All destinations</a>
             </div>
             <div class="mt-10 grid grid-cols-2 gap-x-4 gap-y-8 md:grid-cols-3 lg:gap-x-8">

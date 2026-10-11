@@ -36,6 +36,7 @@ class BookingController extends Controller
             $package, (int) $data['adults'], $children,
             isset($data['room_type_id']) ? (int) $data['room_type_id'] : null,
             array_values(array_unique($data['extras'] ?? [])),
+            array_map('strval', $data['options'] ?? []),
         );
 
         $booking = $package->bookings()->create([
@@ -50,6 +51,7 @@ class BookingController extends Controller
             'room_type_id' => $quote['room']['id'] ?? null,
             'room_preference' => $quote['room']['name'] ?? null,
             'extras' => array_map(fn (array $extra) => ['name' => $extra['name'], 'price' => $extra['price'], 'per' => $extra['per']], $quote['extras']),
+            'options' => $quote['options'],
             'price_breakdown' => $quote['lines'],
             'total_estimate' => $quote['total'],
         ] + self::currencySnapshot());

@@ -32,7 +32,7 @@ class MediaController extends Controller
         $request->validate(['urls' => 'required|string|max:50000']);
 
         $urls = collect(preg_split('/\s+/', $request->input('urls')))
-            ->map(fn ($u) => trim($u))->filter(fn ($u) => MediaAsset::isRemote($u) && filter_var($u, FILTER_VALIDATE_URL))->unique();
+            ->map(fn ($u) => trim($u))->filter(fn ($u) => (MediaAsset::isRemote($u) && filter_var($u, FILTER_VALIDATE_URL)) || MediaAsset::isWikiReference($u))->unique();
 
         $urls->each(fn ($u) => MediaAsset::register($u));
 

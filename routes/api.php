@@ -13,6 +13,7 @@ Route::prefix('v1')->group(function () {
     Route::get('packages', [CatalogController::class, 'packages']);
     Route::get('packages/{package}', [CatalogController::class, 'package']);
     Route::get('hotels', [CatalogController::class, 'hotels']);
+    Route::get('vibes', [CatalogController::class, 'vibes']);
     Route::get('testimonials', [CatalogController::class, 'testimonials']);
     Route::get('faqs', [CatalogController::class, 'faqs']);
 

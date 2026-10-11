@@ -15,7 +15,7 @@
             <h3 class="text-lg leading-snug font-bold tracking-tight text-slate-900 group-hover:text-brand-700">{{ $package->title }}</h3>
             <span class="mt-0.5 inline-flex shrink-0 items-center gap-1 text-sm font-medium text-slate-900"><x-icon name="star" class="size-3.5"/>{{ number_format($package->rating, 1) }}</span>
         </div>
-        <p class="mt-1 text-sm text-slate-500">{{ $package->duration_days }} days @if ($package->start_city) · from {{ $package->start_city }} @endif @if ($package->best_season) · {{ $package->best_season }} @endif</p>
+        <p class="mt-1 text-sm text-slate-500">{{ $package->duration_days }} days @if ($package->country_name) · {{ $package->country_name }} @endif @if ($package->best_season) · {{ $package->best_season }} @endif</p>
         <p class="mt-2 line-clamp-2 text-sm leading-relaxed text-slate-600">{{ $package->summary }}</p>
         <x-price class="mt-3" :amount="$package->price" :original="$package->original_price" size="sm"/>
     </div>

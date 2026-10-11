@@ -7,7 +7,7 @@
                     @if ($d->is_featured)<span class="absolute top-3 left-3 rounded-full bg-lake-300 px-2.5 py-1 text-xs font-semibold text-slate-900">Featured</span>@endif
                 </x-media>
                 <div class="p-4">
-                    <p class="text-xs text-brand-600">{{ $d->region }}</p>
+                    <p class="text-xs text-brand-600">{{ $d->country_name }}{{ $d->region ? ' · '.$d->region : '' }}</p>
                     <p class="font-semibold text-slate-900">{{ $d->name }}</p>
                     <p class="mt-1 text-xs text-ink/50">{{ $d->packages_count }} journeys · {{ $d->hotels_count }} stays</p>
                     <div class="mt-3 flex gap-1">

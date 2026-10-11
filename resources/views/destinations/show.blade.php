@@ -1,5 +1,5 @@
 <x-site-layout :title="$destination->name" :description="$destination->tagline">
-    <x-page-hero :eyebrow="$destination->region" :title="$destination->name" :intro="$destination->tagline" :image="$destination->image_url">
+    <x-page-hero :eyebrow="$destination->country_name.($destination->region ? ' · '.$destination->region : '')" :title="$destination->name" :intro="$destination->tagline" :image="$destination->image_url">
         @if ($destination->best_season)
             <p class="mt-6 inline-flex items-center gap-2 rounded-full bg-white/10 px-4 py-2 text-sm ring-1 ring-white/20 backdrop-blur"><x-icon name="sun" class="size-4 text-lake-300"/>Best time to visit: {{ $destination->best_season }}</p>
         @endif
@@ -53,7 +53,7 @@
     @if ($nearby->isNotEmpty())
         <section class="border-t border-slate-200 py-16">
             <div class="container-x">
-                <h2 class="heading-md text-slate-900">More in {{ $destination->region }}</h2>
+                <h2 class="heading-md text-slate-900">More in {{ $destination->country_name }}</h2>
                 <div class="mt-8 grid grid-cols-2 gap-4 md:grid-cols-3">
                     @foreach ($nearby as $d)
                         <a href="{{ route('destinations.show', $d) }}" class="group relative block overflow-hidden rounded-3xl">

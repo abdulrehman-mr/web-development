@@ -20,7 +20,7 @@ class DestinationController extends Controller
 
     public function create()
     {
-        return view('admin.destinations.form', ['destination' => new Destination(['region' => 'Punjab'])]);
+        return view('admin.destinations.form', ['destination' => new Destination(['country' => 'PK', 'region' => ''])]);
     }
 
     public function store(Request $request)
@@ -53,7 +53,8 @@ class DestinationController extends Controller
     {
         $data = $request->validate([
             'name' => 'required|string|max:120',
-            'region' => ['required', Rule::in(Destination::REGIONS)],
+            'country' => ['nullable', Rule::in(array_keys(config('countries')))],
+            'region' => 'nullable|string|max:120',
             'tagline' => 'nullable|string|max:200',
             'description' => 'nullable|string',
             'highlights' => 'nullable|string',
@@ -64,7 +65,8 @@ class DestinationController extends Controller
         $destination->fill([
             'name' => $data['name'],
             'slug' => $destination->slug ?: $this->uniqueSlug(Destination::class, $data['name']),
-            'region' => $data['region'],
+            'country' => $data['country'] ?? $destination->country ?? 'PK',
+            'region' => $data['region'] ?? '',
             'tagline' => $data['tagline'] ?? null,
             'description' => $data['description'] ?? null,
             'highlights' => $this->lines($data['highlights'] ?? ''),

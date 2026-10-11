@@ -1,14 +1,28 @@
-<x-site-layout :title="$activeCategory?->name ?? 'Journeys'" :description="$activeCategory?->description">
+@php
+    $activeCountry = isset($filters['country']) ? (config('countries')[strtoupper($filters['country'])] ?? null) : null;
+    $heroTitle = $activeCategory?->name ?? $activeVibe?->name ?? ($activeCountry ? 'Journeys in '.$activeCountry : 'Private, tailor-made journeys');
+    $heroIntro = $activeCategory?->description ?? $activeVibe?->description ?? 'Every itinerary below is private to your group and can be tailored: longer, shorter, slower, or with family visits along the way.';
+@endphp
+<x-site-layout :title="$heroTitle" :description="$heroIntro">
     <x-page-hero
-        :eyebrow="$activeCategory ? 'Experience' : 'All journeys'"
-        :title="$activeCategory?->name ?? 'Private journeys through Pakistan'"
-        :intro="$activeCategory?->description ?? 'Every itinerary below is private to your group and can be tailored — longer, shorter, slower, or with a visit to your family’s village.'"
+        :eyebrow="$activeCategory ? 'Experience' : ($activeVibe ? 'Vibe' : 'All journeys')"
+        :title="$heroTitle"
+        :intro="$heroIntro"
         :image="$activeCategory?->image_url ?? media_url(setting('hero_image'))"/>
 
     <section class="py-12 sm:py-16">
         <div class="container-x">
             {{-- Filters --}}
-            <form method="get" x-data @change="$el.submit()" class="grid gap-3 rounded-2xl bg-white p-3 ring-1 ring-slate-200 sm:grid-cols-2 lg:grid-cols-[1.2fr_1fr_1fr_1fr_1fr]">
+            <form method="get" x-data @change="$el.submit()" class="grid gap-3 rounded-2xl bg-white p-3 ring-1 ring-slate-200 sm:grid-cols-2 {{ count($countries) > 1 ? 'lg:grid-cols-6' : 'lg:grid-cols-5' }}">
+                @if (! empty($filters['vibe']))<input type="hidden" name="vibe" value="{{ $filters['vibe'] }}">@endif
+                @if (count($countries) > 1)
+                    <select name="country" class="field border-transparent bg-white" aria-label="Country">
+                        <option value="">All countries</option>
+                        @foreach ($countries as $code => $countryName)
+                            <option value="{{ $code }}" @selected(strtoupper($filters['country'] ?? '') === $code)>{{ $countryName }}</option>
+                        @endforeach
+                    </select>
+                @endif
                 <label class="relative">
                     <span class="sr-only">Search</span>
                     <x-icon name="search" class="pointer-events-none absolute top-1/2 left-4 size-4.5 -translate-y-1/2 text-ink/40"/>
@@ -39,6 +53,17 @@
                     <option value="duration" @selected(($filters['sort'] ?? '') === 'duration')>Shortest first</option>
                 </select>
             </form>
+
+            @if ($vibes->isNotEmpty())
+                <div class="mt-4 flex gap-2 overflow-x-auto pb-1" aria-label="Filter by vibe">
+                    <a href="{{ route('packages.index', \Illuminate\Support\Arr::except(request()->query(), ['vibe', 'page'])) }}" @class(['inline-flex shrink-0 items-center gap-1.5 rounded-full px-3.5 py-2 text-sm font-medium ring-1 transition', empty($filters['vibe']) ? 'bg-slate-900 text-white ring-slate-900' : 'bg-white text-slate-700 ring-slate-200 hover:ring-slate-400'])>All vibes</a>
+                    @foreach ($vibes as $vibe)
+                        <a href="{{ route('packages.index', [...\Illuminate\Support\Arr::except(request()->query(), ['vibe', 'page']), 'vibe' => $vibe->slug]) }}" @class(['inline-flex shrink-0 items-center gap-1.5 rounded-full px-3.5 py-2 text-sm font-medium ring-1 transition', ($filters['vibe'] ?? '') === $vibe->slug ? 'bg-slate-900 text-white ring-slate-900' : 'bg-white text-slate-700 ring-slate-200 hover:ring-slate-400'])>
+                            <x-icon :name="$vibe->icon" class="size-4"/>{{ $vibe->name }}
+                        </a>
+                    @endforeach
+                </div>
+            @endif
 
             <div class="mt-8 flex items-center justify-between text-sm text-ink/60">
                 <p>{{ $packages->total() }} {{ Str::plural('journey', $packages->total()) }}</p>

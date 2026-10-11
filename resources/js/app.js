@@ -71,6 +71,7 @@ Alpine.data('bookingConfigurator', (pricing, currency, initial) => ({
     children: initial.children,
     roomId: initial.roomId ?? pricing.rooms.find((r) => r.default)?.id ?? null,
     chosenExtras: initial.extras,
+    chosenOptions: Object.fromEntries(pricing.groups.map((g) => [g.key, initial.options?.[g.key] ?? g.options[0].key])),
     get travellers() { return this.adults + this.children },
     adultPriceFor(travellers) {
         const tier = this.tiers.filter((t) => travellers >= t.min).pop();
@@ -87,6 +88,12 @@ Alpine.data('bookingConfigurator', (pricing, currency, initial) => ({
         if (this.room && this.room.adjustment !== 0) {
             lines.push({ label: `${this.room.name} × ${this.adults} adult${this.adults > 1 ? 's' : ''}`, amount: this.adults * this.room.adjustment });
         }
+        this.groups.forEach((g) => {
+            const o = g.options.find((x) => x.key === this.chosenOptions[g.key]);
+            if (!o || o.price === 0) return;
+            const qty = o.per === 'person' ? this.travellers : (o.per === 'booking' ? 1 : this.adults);
+            lines.push({ label: `${g.name}: ${o.label}${qty > 1 ? ` × ${qty}` : ''}`, amount: qty * o.price });
+        });
         this.extras.filter((e) => this.chosenExtras.includes(e.key)).forEach((e) => {
             const qty = e.per === 'person' ? this.travellers : 1;
             lines.push({ label: e.name + (qty > 1 ? ` × ${qty}` : ''), amount: qty * e.price });

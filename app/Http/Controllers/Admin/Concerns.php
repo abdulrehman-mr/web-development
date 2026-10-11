@@ -21,7 +21,7 @@ trait Concerns
         $value = $request->has($field) ? $request->input($field) : $current;
 
         // Remote images are added to the media library so they can be imported locally.
-        if (MediaAsset::isRemote($value)) {
+        if (MediaAsset::isImportable($value)) {
             MediaAsset::register($value);
         }
 

@@ -9,6 +9,8 @@
     $roomOptions = $package->room_options ?? [];
     $defaultRoom = (int) old('default_room_type_id', $package->default_room_type_id ?? $roomTypes->first()?->id);
     $base = currencies()->base()->code;
+    $selectedVibes = collect(old('vibe_ids', $package->vibes?->pluck('id')->all() ?? []))->map(fn ($id) => (int) $id)->all();
+    $groups = collect(old('groups', $package->option_groups ?? []))->map(fn ($g) => [...$g, 'options' => collect($g['options'] ?? [])->map(fn ($o) => [...$o, 'hotel_id' => (string) ($o['hotel_id'] ?? '')])->all()])->all();
 @endphp
 <x-admin-layout :title="$editing ? 'Edit journey' : 'New journey'">
     <x-slot:actions>
@@ -74,6 +76,42 @@
                         @endforeach
                     </div>
                     <p class="mt-1 text-xs text-slate-500">Leave the price blank to use the room type’s standard price shown in grey.</p>
+                </div>
+
+                {{-- Option groups --}}
+                <div class="mt-6" x-data="{ groups: @js(array_values($groups)) }">
+                    <p class="text-sm font-semibold text-slate-900">Choice groups</p>
+                    <p class="text-xs text-slate-500">Let guests pick one option per group, e.g. “Hotel in Makkah” (pick from your stays), or “Package class” with Economy / Standard / VIP. The first option is pre-selected; prices can be negative.</p>
+                    <div class="mt-3 space-y-4">
+                        <template x-for="(group, g) in groups" :key="g">
+                            <div class="rounded-xl bg-slate-50 p-3 ring-1 ring-slate-200">
+                                <div class="grid gap-2 sm:grid-cols-[1fr_auto]">
+                                    <input :name="`groups[${g}][name]`" x-model="group.name" placeholder="Group name, e.g. Hotel in Makkah" class="field py-2" required>
+                                    <button type="button" @click="groups.splice(g, 1)" class="rounded-lg p-2 text-rose-600 hover:bg-rose-50" aria-label="Remove group"><x-icon name="trash" class="size-4"/></button>
+                                    <input :name="`groups[${g}][description]`" x-model="group.description" placeholder="Help text (optional), e.g. 5 nights, price per adult" class="field py-2 sm:col-span-2">
+                                </div>
+                                <div class="mt-3 space-y-2">
+                                    <template x-for="(option, o) in group.options" :key="o">
+                                        <div class="grid gap-2 rounded-lg bg-white p-2 ring-1 ring-slate-200 sm:grid-cols-[1fr_1fr_7rem_8rem_auto]">
+                                            <select :name="`groups[${g}][options][${o}][hotel_id]`" x-model="option.hotel_id" class="field py-2" aria-label="Hotel">
+                                                <option value="">— Not a hotel —</option>
+                                                @foreach ($hotels as $h)
+                                                    <option value="{{ $h->id }}">{{ $h->name }}</option>
+                                                @endforeach
+                                            </select>
+                                            <input :name="`groups[${g}][options][${o}][label]`" x-model="option.label" placeholder="Label (blank = hotel name)" class="field py-2">
+                                            <input type="number" step="1" :name="`groups[${g}][options][${o}][price]`" x-model="option.price" placeholder="± price" class="field py-2" required>
+                                            <select :name="`groups[${g}][options][${o}][per]`" x-model="option.per" class="field py-2"><option value="adult">per adult</option><option value="person">per person</option><option value="booking">per booking</option></select>
+                                            <button type="button" @click="group.options.splice(o, 1)" class="rounded-lg p-2 text-rose-600 hover:bg-rose-50" aria-label="Remove option"><x-icon name="x" class="size-4"/></button>
+                                            <input :name="`groups[${g}][options][${o}][description]`" x-model="option.description" placeholder="Description (optional)" class="field py-2 sm:col-span-5">
+                                        </div>
+                                    </template>
+                                </div>
+                                <button type="button" @click="group.options.push({ hotel_id: '', label: '', price: 0, per: 'adult', description: '' })" class="btn btn-ghost mt-2 py-1.5 text-xs"><x-icon name="plus" class="size-3.5"/>Add option</button>
+                            </div>
+                        </template>
+                    </div>
+                    <button type="button" @click="groups.push({ name: '', description: '', options: [{ hotel_id: '', label: '', price: 0, per: 'adult', description: '' }] })" class="btn btn-ghost mt-3 py-2"><x-icon name="plus" class="size-4"/>Add choice group</button>
                 </div>
 
                 {{-- Extras --}}
@@ -182,6 +220,24 @@
                     <x-admin.input name="group_size" label="Group size" :value="$package->group_size" placeholder="Private · 2–12 guests" class="col-span-2"/>
                     <x-admin.input name="best_season" label="Best season" :value="$package->best_season" placeholder="Oct – Mar"/>
                     <x-admin.input name="start_city" label="Starts in" :value="$package->start_city" placeholder="Lahore"/>
+                </div>
+            </x-admin.card>
+
+            <x-admin.card title="Country & vibes">
+                <label for="f_country" class="label">Country</label>
+                <select id="f_country" name="country" class="field">
+                    @foreach (config('countries') as $code => $countryName)
+                        <option value="{{ $code }}" @selected(old('country', $package->country ?? 'PK') === $code)>{{ $countryName }}</option>
+                    @endforeach
+                </select>
+                <p class="mt-4 mb-2 text-sm font-medium text-slate-700">Vibes</p>
+                <div class="grid grid-cols-2 gap-1">
+                    @foreach ($vibes as $vibe)
+                        <label class="flex cursor-pointer items-center gap-2 rounded-lg px-2 py-1.5 text-sm hover:bg-slate-50">
+                            <input type="checkbox" name="vibe_ids[]" value="{{ $vibe->id }}" @checked(in_array($vibe->id, $selectedVibes, true)) class="size-4 accent-brand-700">
+                            <x-icon :name="$vibe->icon" class="size-4 text-slate-500"/>{{ $vibe->name }}
+                        </label>
+                    @endforeach
                 </div>
             </x-admin.card>
 

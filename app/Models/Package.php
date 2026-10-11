@@ -13,8 +13,8 @@ class Package extends Model
     public const DIFFICULTIES = ['Easy', 'Moderate', 'Active', 'Challenging'];
 
     protected $fillable = [
-        'category_id', 'title', 'slug', 'summary', 'overview', 'duration_days', 'price', 'original_price',
-        'child_price', 'group_tiers', 'room_options', 'default_room_type_id', 'extras',
+        'category_id', 'country', 'pack', 'title', 'slug', 'summary', 'overview', 'duration_days', 'price', 'original_price',
+        'child_price', 'group_tiers', 'room_options', 'default_room_type_id', 'extras', 'option_groups',
         'group_size', 'difficulty', 'best_season', 'start_city', 'hero_image', 'gallery', 'highlights',
         'inclusions', 'exclusions', 'is_featured', 'is_published', 'rating', 'sort_order',
     ];
@@ -26,6 +26,7 @@ class Package extends Model
             'group_tiers' => 'array',
             'room_options' => 'array',
             'extras' => 'array',
+            'option_groups' => 'array',
             'child_price' => 'decimal:2',
             'highlights' => 'array',
             'inclusions' => 'array',
@@ -46,6 +47,16 @@ class Package extends Model
     public function destinations(): BelongsToMany
     {
         return $this->belongsToMany(Destination::class);
+    }
+
+    public function vibes(): BelongsToMany
+    {
+        return $this->belongsToMany(Vibe::class)->orderBy('sort_order');
+    }
+
+    public function getCountryNameAttribute(): ?string
+    {
+        return $this->country ? (config('countries')[$this->country] ?? $this->country) : null;
     }
 
     public function days(): HasMany

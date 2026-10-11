@@ -40,6 +40,26 @@ A premium, responsive travel website for a Pakistan tour operator that serves gu
 
 The POST endpoints are rate-limited.
 
+## Content packs, countries and vibes
+
+**Admin → Content packs** adds a whole country in one click: destinations, hotels and complete journeys with itineraries, prices, group prices, room and hotel choices, extras and vibes. Packs are available for India, Maldives, Saudi Arabia (Umrah & Hajj), Thailand, South Korea, France, United Kingdom, USA & Niagara Falls, Turkey, Azerbaijan and China.
+
+- Pack prices are in USD and converted to your base currency on import.
+- Importing again never creates duplicates or overwrites your edits.
+- "Remove pack" deletes what the pack added, but keeps (unpublished) any journey that already has bookings.
+- Pack images are Wikipedia article references (`wiki:Eiffel Tower`). The image importer looks up each article's main photo and downloads it. This runs every 15 minutes through the scheduler, or straight away from Admin → Media library → Import now.
+- Pack hotels, prices and itineraries are sample content, so review them before you sell.
+
+Packs live in `database/packs/*.php`; copy one to create your own.
+
+**Vibes** (Admin → Vibes) are travel themes such as Heritage, Romantic, Religious & spiritual, Countryside, Nature, Tech-savvy and Festivals. Journeys can have several. Visitors browse them on the home page and filter by them on the journeys page.
+
+**Choice groups** (journey editor → Prices & options) let guests pick one option per group, each with its own price per adult, per person or per booking. For example:
+- **Hotel in Makkah**, picked from your stays and shown with photo, address and stars
+- **Package class**: Economy, Standard or VIP
+
+Combine them with room options, such as Quad, Triple or Double sharing or a Private room.
+
 ## Payments
 
 Guests request a journey, then pay a deposit or the full amount on `/booking/{reference}/pay`. Every provider uses its own hosted checkout, so card details never reach this server. A payment is only marked paid after the server confirms it: Stripe and PayPal through their APIs on return, and every provider through its signed webhook.

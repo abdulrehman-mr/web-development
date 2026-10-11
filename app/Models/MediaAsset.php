@@ -29,6 +29,18 @@ class MediaAsset extends Model
         return is_string($value) && (str_starts_with($value, 'http://') || str_starts_with($value, 'https://'));
     }
 
+    /** "wiki:Eiffel Tower" means "the main photo of that Wikipedia article", resolved on import. */
+    public static function isWikiReference(?string $value): bool
+    {
+        return is_string($value) && str_starts_with($value, 'wiki:') && strlen($value) > 5;
+    }
+
+    /** Anything the importer can fetch: a web URL or a Wikipedia article reference. */
+    public static function isImportable(?string $value): bool
+    {
+        return static::isRemote($value) || static::isWikiReference($value);
+    }
+
     public static function register(string $url): self
     {
         return static::firstOrCreate(['source_hash' => sha1($url)], ['source_url' => $url]);

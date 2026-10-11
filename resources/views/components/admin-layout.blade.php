@@ -10,6 +10,8 @@
         ['Stays', 'admin.hotels.index', 'bed', 'admin.hotels.*'],
         ['Experiences', 'admin.categories.index', 'tag', 'admin.categories.*'],
         ['Room types', 'admin.room-types.edit', 'bed', 'admin.room-types.*'],
+        ['Vibes', 'admin.vibes.edit', 'sparkle', 'admin.vibes.*'],
+        ['Content packs', 'admin.content-packs.index', 'globe', 'admin.content-packs.*'],
         null,
         ['Reviews', 'admin.testimonials.index', 'quote', 'admin.testimonials.*'],
         ['FAQs', 'admin.faqs.index', 'help', 'admin.faqs.*'],

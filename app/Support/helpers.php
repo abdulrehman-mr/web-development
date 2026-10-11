@@ -10,7 +10,8 @@ if (! function_exists('media_url')) {
      */
     function media_url(?string $value): ?string
     {
-        if (blank($value)) {
+        // Not downloaded yet (see ImageImporter); the branded fallback shows meanwhile.
+        if (blank($value) || str_starts_with($value, 'wiki:')) {
             return null;
         }
 

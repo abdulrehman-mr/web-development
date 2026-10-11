@@ -10,6 +10,7 @@ use App\Models\Hotel;
 use App\Models\Package;
 use App\Models\Setting;
 use App\Models\Testimonial;
+use App\Models\Vibe;
 use Illuminate\Http\Request;
 
 class CatalogController extends Controller
@@ -44,9 +45,11 @@ class CatalogController extends Controller
 
     public function packages(Request $request)
     {
-        $packages = Package::published()->with('category')
+        $packages = Package::published()->with('category', 'vibes')
             ->when($request->query('category'), fn ($q, $slug) => $q->whereHas('category', fn ($c) => $c->where('slug', $slug)))
             ->when($request->boolean('featured'), fn ($q) => $q->where('is_featured', true))
+            ->when($request->query('country'), fn ($q, $code) => $q->where('country', strtoupper($code)))
+            ->when($request->query('vibe'), fn ($q, $slug) => $q->whereHas('vibes', fn ($v) => $v->where('slug', $slug)))
             ->orderBy('sort_order')
             ->paginate(min((int) $request->query('per_page', 12), 50));
 
@@ -56,7 +59,7 @@ class CatalogController extends Controller
     public function package(Package $package)
     {
         abort_unless($package->is_published, 404);
-        $package->load(['category', 'destinations', 'days.hotel']);
+        $package->load(['category', 'destinations', 'days.hotel', 'vibes']);
 
         return ['data' => $this->packageSummary($package) + [
             'overview' => $package->overview,
@@ -80,6 +83,11 @@ class CatalogController extends Controller
         return ['data' => Hotel::with('destination')->orderBy('name')->get()->map(fn ($h) => $this->hotelData($h))];
     }
 
+    public function vibes()
+    {
+        return ['data' => Vibe::orderBy('sort_order')->get(['name', 'slug', 'description', 'icon'])];
+    }
+
     public function testimonials()
     {
         return ['data' => Testimonial::where('is_published', true)->orderBy('sort_order')->get(['name', 'location', 'quote', 'rating'])];
@@ -98,6 +106,8 @@ class CatalogController extends Controller
             'slug' => $p->slug,
             'url' => route('packages.show', $p),
             'category' => $p->category?->only('name', 'slug'),
+            'country' => $p->country,
+            'vibes' => $p->vibes->map(fn ($v) => $v->only('name', 'slug'))->values(),
             'summary' => $p->summary,
             'duration_days' => $p->duration_days,
             'price' => (float) $p->price,
@@ -115,7 +125,7 @@ class CatalogController extends Controller
 
     private function destinationData(Destination $d): array
     {
-        return $d->only('id', 'name', 'slug', 'region', 'tagline', 'description', 'highlights', 'best_season', 'is_featured') + ['image' => $d->image_url];
+        return $d->only('id', 'name', 'slug', 'country', 'region', 'tagline', 'description', 'highlights', 'best_season', 'is_featured') + ['image' => $d->image_url];
     }
 
     private function hotelData(Hotel $h): array

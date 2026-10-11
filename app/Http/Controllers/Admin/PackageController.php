@@ -9,6 +9,7 @@ use App\Models\Hotel;
 use App\Models\MediaAsset;
 use App\Models\Package;
 use App\Models\RoomType;
+use App\Models\Vibe;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Validation\Rule;
@@ -28,7 +29,7 @@ class PackageController extends Controller
 
     public function create()
     {
-        return $this->form(new Package(['is_published' => true, 'duration_days' => 7, 'difficulty' => 'Easy', 'rating' => 5]));
+        return $this->form(new Package(['is_published' => true, 'duration_days' => 7, 'difficulty' => 'Easy', 'rating' => 5, 'country' => 'PK']));
     }
 
     public function store(Request $request)
@@ -40,7 +41,7 @@ class PackageController extends Controller
 
     public function edit(Package $package)
     {
-        return $this->form($package->load('days', 'destinations'));
+        return $this->form($package->load('days', 'destinations', 'vibes'));
     }
 
     public function update(Request $request, Package $package)
@@ -65,6 +66,7 @@ class PackageController extends Controller
             'destinations' => Destination::orderBy('name')->get(),
             'hotels' => Hotel::with('destination')->orderBy('name')->get(),
             'roomTypes' => RoomType::active()->get(),
+            'vibes' => Vibe::orderBy('sort_order')->get(),
         ]);
     }
 
@@ -110,6 +112,18 @@ class PackageController extends Controller
             'extras.*.description' => 'nullable|string|max:255',
             'extras.*.price' => 'required|numeric|min:-100000|max:100000',
             'extras.*.per' => 'required|in:person,booking',
+            'country' => ['nullable', Rule::in(array_keys(config('countries')))],
+            'vibe_ids' => 'nullable|array',
+            'vibe_ids.*' => 'exists:vibes,id',
+            'groups' => 'nullable|array',
+            'groups.*.name' => 'required|string|max:80',
+            'groups.*.description' => 'nullable|string|max:255',
+            'groups.*.options' => 'required|array|min:1',
+            'groups.*.options.*.label' => 'nullable|string|max:120',
+            'groups.*.options.*.description' => 'nullable|string|max:255',
+            'groups.*.options.*.hotel_id' => 'nullable|exists:hotels,id',
+            'groups.*.options.*.price' => 'required|numeric|min:-100000|max:100000',
+            'groups.*.options.*.per' => 'required|in:adult,person,booking',
         ] + $this->imageRules('hero_image'));
 
         $gallery = $this->lines($data['gallery'] ?? '');
@@ -140,6 +154,15 @@ class PackageController extends Controller
             'exclusions' => $this->lines($data['exclusions'] ?? ''),
             'is_featured' => $request->boolean('is_featured'),
             'is_published' => $request->boolean('is_published'),
+            'country' => $data['country'] ?? $package->country
+                ?? Destination::whereIn('id', $data['destination_ids'] ?? [])->value('country') ?? 'PK',
+            'option_groups' => collect($data['groups'] ?? [])->map(fn ($g) => [
+                'name' => $g['name'], 'description' => $g['description'] ?? null,
+                'options' => collect($g['options'])->filter(fn ($o) => filled($o['label'] ?? null) || filled($o['hotel_id'] ?? null))->map(fn ($o) => [
+                    'label' => $o['label'] ?? null, 'description' => $o['description'] ?? null,
+                    'hotel_id' => isset($o['hotel_id']) ? (int) $o['hotel_id'] : null, 'price' => (float) $o['price'], 'per' => $o['per'],
+                ])->values()->all(),
+            ])->filter(fn ($g) => $g['options'] !== [])->values()->all(),
             'child_price' => $data['child_price'] ?? null,
             'group_tiers' => collect($data['tiers'] ?? [])->map(fn ($t) => ['min' => (int) $t['min'], 'price' => (float) $t['price']])->sortBy('min')->values()->all(),
             'room_options' => collect($data['rooms'] ?? [])->map(fn ($r) => [
@@ -153,6 +176,7 @@ class PackageController extends Controller
         ])->save();
 
         $package->destinations()->sync($data['destination_ids'] ?? []);
+        $package->vibes()->sync($data['vibe_ids'] ?? []);
 
         $package->days()->delete();
         foreach (array_values($data['days'] ?? []) as $i => $day) {

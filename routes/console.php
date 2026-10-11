@@ -9,3 +9,4 @@ Artisan::command('inspire', function () {
 })->purpose('Display an inspiring quote');
 
 Schedule::command('currencies:update-rates')->dailyAt('03:17')->withoutOverlapping();
+Schedule::command('images:import --limit=40')->everyFifteenMinutes()->withoutOverlapping();

@@ -13,7 +13,9 @@
         'children' => (int) old('children', 0),
         'roomId' => old('room_type_id') ? (int) old('room_type_id') : null,
         'extras' => array_values((array) old('extras', [])),
+        'options' => (object) old('options', []),
     ];
+    $perLabel = ['adult' => 'per adult', 'person' => 'per person', 'booking' => 'per booking'];
 @endphp
 <x-site-layout :title="'Book '.$package->title">
     <form method="post" action="{{ route('bookings.store', $package) }}" x-data="bookingConfigurator(@js($pricing), @js($currency), @js($initial))" class="pt-24 pb-28 sm:pt-28 lg:pb-20">
@@ -96,6 +98,37 @@
                             </div>
                         </section>
                     @endif
+
+                    {{-- Option groups (e.g. hotel choice, package class) --}}
+                    @foreach ($pricing['groups'] as $group)
+                        <section>
+                            <h2 class="flex items-center gap-3 text-lg font-bold text-slate-900"><span class="grid size-7 place-items-center rounded-full bg-brand-700 text-sm text-white"><x-icon name="check" class="size-4"/></span>{{ $group['name'] }}</h2>
+                            @if ($group['description'])<p class="mt-1 text-sm text-slate-500">{{ $group['description'] }}</p>@endif
+                            <div class="mt-4 space-y-2">
+                                @foreach ($group['options'] as $option)
+                                    <label class="flex cursor-pointer items-center gap-4 rounded-2xl p-3 ring-1 transition" :class="chosenOptions['{{ $group['key'] }}'] === '{{ $option['key'] }}' ? 'bg-brand-50 ring-2 ring-brand-700' : 'bg-white ring-slate-200 hover:ring-slate-300'">
+                                        <input type="radio" name="options[{{ $group['key'] }}]" value="{{ $option['key'] }}" x-model="chosenOptions['{{ $group['key'] }}']" class="sr-only">
+                                        @if ($option['hotel'])
+                                            <x-media :src="$option['hotel']['image']" :alt="$option['label']" class="size-16 shrink-0 rounded-xl sm:size-20"/>
+                                        @endif
+                                        <span class="min-w-0 flex-1">
+                                            <span class="block font-semibold text-slate-900">{{ $option['label'] }}</span>
+                                            @if ($option['hotel'])
+                                                <span class="mt-0.5 flex items-center gap-1 text-xs text-slate-500"><x-icon name="map-pin" class="size-3.5 shrink-0"/><span class="truncate">{{ $option['hotel']['address'] }}</span></span>
+                                                <span class="mt-0.5 flex text-slate-900" aria-label="{{ $option['hotel']['stars'] }} stars">@for ($i = 0; $i < $option['hotel']['stars']; $i++)<x-icon name="star" class="size-3"/>@endfor</span>
+                                            @elseif ($option['description'])
+                                                <span class="mt-0.5 block text-sm leading-snug text-slate-500">{{ $option['description'] }}</span>
+                                            @endif
+                                        </span>
+                                        <span class="shrink-0 text-right text-sm">
+                                            <span class="block font-semibold" :class="{{ $option['price'] }} < 0 ? 'text-brand-700' : 'text-slate-900'" x-text="{{ $option['price'] }} === 0 ? 'Included' : money({{ $option['price'] }}, true)"></span>
+                                            @if ($option['price'] != 0)<span class="block text-xs text-slate-500">{{ $perLabel[$option['per']] }}</span>@endif
+                                        </span>
+                                    </label>
+                                @endforeach
+                            </div>
+                        </section>
+                    @endforeach
 
                     {{-- 4. Extras --}}
                     @if (count($pricing['extras']))

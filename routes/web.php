@@ -63,6 +63,11 @@ Route::prefix('admin')->name('admin.')->middleware('auth')->group(function () {
     Route::post('media/scan', [Admin\MediaController::class, 'scan'])->name('media.scan');
     Route::post('media/import', [Admin\MediaController::class, 'import'])->name('media.import');
     Route::delete('media/{medium}', [Admin\MediaController::class, 'destroy'])->name('media.destroy');
+    Route::get('content-packs', [Admin\ContentPackController::class, 'index'])->name('content-packs.index');
+    Route::post('content-packs/{pack}', [Admin\ContentPackController::class, 'import'])->name('content-packs.import');
+    Route::delete('content-packs/{pack}', [Admin\ContentPackController::class, 'destroy'])->name('content-packs.destroy');
+    Route::get('vibes', [Admin\VibeController::class, 'edit'])->name('vibes.edit');
+    Route::put('vibes', [Admin\VibeController::class, 'update'])->name('vibes.update');
     Route::get('room-types', [Admin\RoomTypeController::class, 'edit'])->name('room-types.edit');
     Route::put('room-types', [Admin\RoomTypeController::class, 'update'])->name('room-types.update');
     Route::get('currencies', [Admin\CurrencyController::class, 'index'])->name('currencies.index');

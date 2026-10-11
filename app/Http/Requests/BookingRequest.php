@@ -28,6 +28,8 @@ class BookingRequest extends FormRequest
             'room_type_id' => 'nullable|integer',
             'extras' => 'nullable|array',
             'extras.*' => 'string|max:10',
+            'options' => 'nullable|array',
+            'options.*' => 'string|max:10',
             'special_requests' => 'nullable|string|max:3000',
         ];
     }

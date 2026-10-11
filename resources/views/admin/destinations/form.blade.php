@@ -6,12 +6,17 @@
             <div class="grid gap-4 sm:grid-cols-2">
                 <x-admin.input name="name" label="Name" :value="$destination->name" required/>
                 <div>
-                    <label for="f_region" class="label">Region</label>
-                    <select id="f_region" name="region" class="field">
-                        @foreach (\App\Models\Destination::REGIONS as $r)
-                            <option @selected(old('region', $destination->region) === $r)>{{ $r }}</option>
+                    <label for="f_country" class="label">Country</label>
+                    <select id="f_country" name="country" class="field">
+                        @foreach (config('countries') as $code => $countryName)
+                            <option value="{{ $code }}" @selected(old('country', $destination->country ?? 'PK') === $code)>{{ $countryName }}</option>
                         @endforeach
                     </select>
+                </div>
+                <div>
+                    <label for="f_region" class="label">Region / province</label>
+                    <input id="f_region" name="region" list="region-suggestions" value="{{ old('region', $destination->region) }}" class="field" placeholder="e.g. Punjab, Île-de-France, Kerala">
+                    <datalist id="region-suggestions">@foreach (\App\Models\Destination::REGIONS as $r)<option value="{{ $r }}">@endforeach</datalist>
                 </div>
                 <x-admin.input name="tagline" label="Tagline" :value="$destination->tagline" class="sm:col-span-2"/>
                 <x-admin.textarea name="description" label="Description" :value="$destination->description" rows="5" class="sm:col-span-2"/>
