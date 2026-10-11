@@ -58,22 +58,24 @@ class CurrencyTest extends TestCase
         $this->actingAs(User::first());
         $this->get('/admin/currencies')->assertOk()->assertSee('All currencies (166)');
 
-        $rows = Currency::all()->mapWithKeys(fn ($c) => [$c->code => [
-            'symbol' => $c->symbol, 'symbol_position' => $c->symbol_position,
-            'rate' => $c->rate, 'is_enabled' => $c->is_enabled ? '1' : null,
-        ]])->all();
-        $rows['PKR']['symbol'] = '₨';
-        $rows['INR'] = ['symbol' => '₹', 'symbol_position' => 'before', 'rate' => 88, 'is_enabled' => '1'];
-        $rows['JPY'] = ['symbol' => '¥', 'symbol_position' => 'before', 'rate' => null, 'is_enabled' => '1'];
+        // The form posts only the rows that changed, as one JSON field.
+        $changed = [
+            'PKR' => ['symbol' => '₨', 'symbol_position' => 'before', 'rate' => 282, 'is_enabled' => 1],
+            'INR' => ['symbol' => '₹', 'symbol_position' => 'before', 'rate' => 88, 'is_enabled' => 1],
+            'JPY' => ['symbol' => '¥', 'symbol_position' => 'after', 'rate' => null, 'is_enabled' => 1],
+        ];
 
         $this->put('/admin/currencies', [
             'base_currency' => 'CAD', 'default_currency' => 'PKR', 'secondary_currency' => '',
-            'currency_switcher' => '1', 'currencies' => $rows,
+            'currency_switcher' => '1', 'currencies_json' => json_encode($changed),
         ])->assertSessionHasNoErrors();
 
         $this->assertSame('₨', Currency::find('PKR')->symbol);
         $this->assertTrue(Currency::find('INR')->is_enabled);
         $this->assertFalse(Currency::find('JPY')->is_enabled, 'A currency without a rate cannot be enabled.');
+        $this->assertSame('after', Currency::find('JPY')->symbol_position);
+        $this->assertSame('€', Currency::find('EUR')->symbol, 'Rows that were not changed are left alone.');
+        $this->assertTrue(Currency::find('EUR')->is_enabled);
 
         // Rates are re-expressed per 1 CAD.
         $this->assertEqualsWithDelta(1.0, Currency::find('CAD')->rate, 0.0001);
@@ -99,5 +101,18 @@ class CurrencyTest extends TestCase
 
         $this->artisan('currencies:update-rates')->assertFailed();
         $this->assertSame(282.0, Currency::find('PKR')->rate);
+    }
+
+    public function test_currency_settings_save_without_row_changes(): void
+    {
+        $this->actingAs(User::first());
+
+        $this->put('/admin/currencies', [
+            'base_currency' => 'USD', 'default_currency' => 'CAD', 'currencies_json' => '{}',
+        ])->assertSessionHasNoErrors();
+
+        $this->assertSame('CAD', setting('default_currency'));
+        $this->put('/admin/currencies', ['base_currency' => 'USD', 'default_currency' => 'USD', 'currencies_json' => 'not json'])
+            ->assertSessionHasErrors('currencies_json');
     }
 }

@@ -1,8 +1,9 @@
 <x-admin-layout title="Currencies">
     <x-slot:actions><button form="currency-form" class="btn btn-primary py-2.5">Save changes</button></x-slot:actions>
 
-    <form id="currency-form" method="post" action="{{ route('admin.currencies.update') }}" class="space-y-6" x-data="{ q: '', onlyEnabled: false }">
+    <form id="currency-form" method="post" action="{{ route('admin.currencies.update') }}" class="space-y-6" x-data="{ q: '', onlyEnabled: false, changed: {} }">
         @csrf @method('PUT')
+        <input type="hidden" name="currencies_json" :value="JSON.stringify(changed)">
 
         <div class="grid gap-6 xl:grid-cols-3">
             <x-admin.card class="xl:col-span-2" title="Site currency" description="Journey prices are entered in the base currency. Visitors can switch to any enabled currency and see converted prices.">
@@ -65,25 +66,27 @@
                     <tbody class="divide-y divide-slate-100">
                         @foreach ($all as $c)
                             @php $isBase = $c->code === $base->code; @endphp
-                            <tr x-data="{ symbol: @js($c->symbol), after: @js($c->symbol_position === 'after'), enabled: @js($c->is_enabled) }"
+                            <tr x-data="{ code: @js($c->code), symbol: @js($c->symbol), position: @js($c->symbol_position === 'after' ? 'after' : 'before'), enabled: @js($c->is_enabled), rate: @js($isBase ? 1 : ($c->rate ? rtrim(rtrim(number_format($c->rate, 6, '.', ''), '0'), '.') : '')),
+                                        record() { changed[this.code] = { symbol: this.symbol, symbol_position: this.position, rate: this.rate === '' ? null : this.rate, is_enabled: this.enabled ? 1 : 0 } } }"
+                                @input="record()" @change="record()"
                                 x-show="(!onlyEnabled || enabled) && (q === '' || @js(strtolower($c->code.' '.$c->name)).includes(q.toLowerCase()))">
-                                <td class="px-5 py-2 sm:px-6"><input type="checkbox" name="currencies[{{ $c->code }}][is_enabled]" value="1" x-model="enabled" @checked($c->is_enabled) class="size-4 accent-brand-700" aria-label="Enable {{ $c->code }}"></td>
+                                <td class="px-5 py-2 sm:px-6"><input type="checkbox" x-model="enabled" class="size-4 accent-brand-700" aria-label="Enable {{ $c->code }}"></td>
                                 <td class="py-2"><span class="font-mono font-semibold text-slate-900">{{ $c->code }}</span> <span class="text-slate-500">{{ $c->name }}</span> @if ($isBase)<span class="ml-1 rounded bg-brand-100 px-1.5 py-0.5 text-xs font-semibold text-brand-800">base</span>@endif</td>
-                                <td class="py-2"><input name="currencies[{{ $c->code }}][symbol]" x-model="symbol" value="{{ $c->symbol }}" maxlength="12" class="field w-20 px-2 py-1.5" aria-label="{{ $c->code }} symbol"></td>
+                                <td class="py-2"><input x-model="symbol" maxlength="12" class="field w-20 px-2 py-1.5" aria-label="{{ $c->code }} symbol"></td>
                                 <td class="py-2">
-                                    <select name="currencies[{{ $c->code }}][symbol_position]" class="field w-28 px-2 py-1.5" @change="after = $event.target.value === 'after'" aria-label="{{ $c->code }} symbol position">
-                                        <option value="before" @selected($c->symbol_position !== 'after')>Before</option>
-                                        <option value="after" @selected($c->symbol_position === 'after')>After</option>
+                                    <select class="field w-28 px-2 py-1.5" x-model="position" aria-label="{{ $c->code }} symbol position">
+                                        <option value="before">Before</option>
+                                        <option value="after">After</option>
                                     </select>
                                 </td>
                                 <td class="py-2">
                                     @if ($isBase)
-                                        <span class="px-2 text-slate-500">1</span><input type="hidden" name="currencies[{{ $c->code }}][rate]" value="1">
+                                        <span class="px-2 text-slate-500">1</span>
                                     @else
-                                        <input type="number" step="any" min="0" name="currencies[{{ $c->code }}][rate]" value="{{ $c->rate ? rtrim(rtrim(number_format($c->rate, 6, '.', ''), '0'), '.') : '' }}" class="field w-32 px-2 py-1.5" placeholder="—" aria-label="{{ $c->code }} rate">
+                                        <input type="number" step="any" min="0" x-model="rate" class="field w-32 px-2 py-1.5" placeholder="—" aria-label="{{ $c->code }} rate">
                                     @endif
                                 </td>
-                                <td class="py-2 pr-5 font-medium text-slate-900" x-text="after ? '1,250 ' + symbol : symbol + (/\p{L}$/u.test(symbol) ? ' ' : '') + '1,250'"></td>
+                                <td class="py-2 pr-5 font-medium text-slate-900" x-text="position === 'after' ? '1,250 ' + symbol : symbol + (/\p{L}$/u.test(symbol) ? ' ' : '') + '1,250'"></td>
                             </tr>
                         @endforeach
                     </tbody>

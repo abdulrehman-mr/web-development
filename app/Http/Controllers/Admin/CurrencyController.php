@@ -27,12 +27,19 @@ class CurrencyController extends Controller
     public function update(Request $request, CurrencyManager $currencies): RedirectResponse
     {
         $codes = Currency::pluck('code')->all();
+        // Changed rows arrive as one JSON field: posting ~800 separate inputs trips
+        // web-application firewalls (too many arguments) and PHP's max_input_vars.
+        $request->validate(['currencies_json' => 'nullable|json']);
+        if ($request->filled('currencies_json')) {
+            $request->merge(['currencies' => (array) json_decode($request->input('currencies_json'), true)]);
+        }
+
         $data = $request->validate([
             'base_currency' => ['required', Rule::in($codes)],
             'default_currency' => ['required', Rule::in($codes)],
             'secondary_currency' => ['nullable', Rule::in($codes)],
             'currency_switcher' => 'nullable|boolean',
-            'currencies' => 'required|array',
+            'currencies' => 'nullable|array',
             'currencies.*.symbol' => 'required|string|max:12',
             'currencies.*.symbol_position' => 'required|in:before,after',
             'currencies.*.rate' => 'nullable|numeric|gt:0',
@@ -40,7 +47,7 @@ class CurrencyController extends Controller
         ]);
 
         $oldBase = $currencies->base()->code;
-        foreach ($data['currencies'] as $code => $row) {
+        foreach ($data['currencies'] ?? [] as $code => $row) {
             if (! in_array($code, $codes, true)) {
                 continue;
             }
