@@ -2,35 +2,38 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\Faq;
-use App\Models\Hotel;
 use App\Models\Inquiry;
-use App\Models\Testimonial;
+use App\Models\Page;
 use App\Support\EmailNotifier;
+use App\Support\PageBuilder;
 use Illuminate\Http\Request;
 use Illuminate\Validation\Rule;
+use Illuminate\View\View;
 
 class PageController extends Controller
 {
-    public function about()
+    public function about(PageBuilder $builder): View
     {
-        return view('pages.about', [
-            'testimonials' => Testimonial::where('is_published', true)->orderBy('sort_order')->take(3)->get(),
-        ]);
+        return $builder->view(Page::system('about'));
     }
 
-    public function stays()
+    public function stays(PageBuilder $builder): View
     {
-        return view('pages.stays', [
-            'hotels' => Hotel::with('destination')->orderByDesc('stars')->orderBy('name')->get()->groupBy('type'),
-        ]);
+        return $builder->view(Page::system('stays'));
     }
 
-    public function contact()
+    public function contact(PageBuilder $builder): View
     {
-        return view('pages.contact', [
-            'faqs' => Faq::where('is_published', true)->orderBy('sort_order')->get(),
-        ]);
+        return $builder->view(Page::system('contact'));
+    }
+
+    /** A page made in Admin → Pages. Drafts are visible to signed-in admins only. */
+    public function show(Page $page, PageBuilder $builder): View
+    {
+        abort_if($page->is_system, 404);
+        abort_unless($page->is_published || auth()->check(), 404);
+
+        return $builder->view($page);
     }
 
     public function sendContact(Request $request)

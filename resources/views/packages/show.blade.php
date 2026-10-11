@@ -217,13 +217,15 @@
                     </div>
                 @endif
 
-                <a href="{{ route('packages.book', $package) }}" class="btn btn-primary mt-6 w-full py-4 text-base">Choose dates & options</a>
-                <p class="mt-3 text-center text-xs leading-relaxed text-slate-500">No payment now. We confirm availability within 24 hours.</p>
+                <a href="{{ route('packages.book', $package) }}" class="btn btn-primary mt-6 w-full py-4 text-base">{{ setting('journey_book_button', 'Choose dates & options') }}</a>
+                @if (setting('journey_book_note'))<p class="mt-3 text-center text-xs leading-relaxed text-slate-500">{{ setting('journey_book_note') }}</p>@endif
             </div>
-            <div class="mt-4 flex items-center gap-3 rounded-2xl bg-brand-50 p-4 text-sm text-brand-900">
-                <x-icon name="phone" class="size-5 shrink-0 text-brand-600"/>
-                <p>Prefer to talk? Call our Toronto desk on <span class="font-semibold whitespace-nowrap">{{ setting('contact_phone_ca') }}</span></p>
-            </div>
+            @if (setting('journey_call_text') && setting('contact_phone_ca'))
+                <div class="mt-4 flex items-center gap-3 rounded-2xl bg-brand-50 p-4 text-sm text-brand-900">
+                    <x-icon name="phone" class="size-5 shrink-0 text-brand-600"/>
+                    <p>{{ setting('journey_call_text') }} <span class="font-semibold whitespace-nowrap">{{ setting('contact_phone_ca') }}</span></p>
+                </div>
+            @endif
         </aside>
     </div>
 

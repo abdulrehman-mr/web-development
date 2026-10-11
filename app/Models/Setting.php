@@ -20,7 +20,8 @@ class Setting extends Model
     protected $fillable = ['key', 'value'];
 
     /**
-     * Editable site content, grouped for the admin "Site content" screen.
+     * Editable site-wide content, grouped for the admin "Site content" screen.
+     * Page content lives in page sections (Admin → Pages).
      * Each field: [label, input type, help text].
      */
     public const SCHEMA = [
@@ -28,33 +29,32 @@ class Setting extends Model
             'site_name' => ['Site name', 'text', null],
             'site_tagline' => ['Tagline', 'text', 'Short line used in the footer and browser title.'],
             'logo' => ['Logo (optional)', 'image', 'Leave empty to use the wordmark.'],
+            'site_description' => ['Search-engine description', 'textarea', 'Used by Google and social shares when a page has no description of its own.'],
         ],
-        'Home hero' => [
-            'hero_eyebrow' => ['Small line above the headline', 'text', null],
-            'hero_title' => ['Headline', 'text', null],
-            'hero_subtitle' => ['Intro paragraph', 'textarea', null],
-            'hero_image' => ['Background image', 'image', 'Wide landscape photo, at least 2000px.'],
+        'Header & menu' => [
+            'menu_items' => ['Menu links', 'textarea', 'One per line as Label|link, e.g. “Journeys|/journeys”. Leave empty for the standard menu. Pages ticked “Show in menu” are added after these.'],
+            'menu_experiences' => ['Experiences dropdown title', 'text', 'Leave empty to hide the dropdown.'],
+            'header_button_label' => ['Header button text', 'text', 'e.g. “Plan my trip”. Leave empty to hide.'],
+            'header_button_url' => ['Header button link', 'text', null],
         ],
-        'Home sections' => [
-            'home_experiences_title' => ['Experiences heading', 'text', 'e.g. “Six ways to discover Pakistan”.'],
-            'home_destinations_title' => ['Destinations heading', 'text', 'e.g. “From the Arabian Sea to the Karakoram”.'],
+        'Footer' => [
+            'footer_about' => ['Text under the logo', 'textarea', null],
+            'footer_links_title' => ['Links column title', 'text', null],
+            'footer_contact_title' => ['Contact column title', 'text', null],
+            'footer_note' => ['Small print', 'text', 'Shown at the very bottom, e.g. how prices are quoted.'],
+            'whatsapp_label' => ['WhatsApp button text', 'text', null],
         ],
-        'Home story' => [
-            'story_title' => ['Story heading', 'text', null],
-            'story_body' => ['Story paragraph', 'textarea', null],
-            'story_image' => ['Story image', 'image', null],
-            'stat_1' => ['Stat 1 (value|label)', 'text', 'e.g. 1,200+|guests hosted'],
-            'stat_2' => ['Stat 2 (value|label)', 'text', null],
-            'stat_3' => ['Stat 3 (value|label)', 'text', null],
-        ],
-        'About page' => [
-            'about_title' => ['About heading', 'text', null],
-            'about_body' => ['About text (blank line between paragraphs)', 'textarea', null],
-            'about_image' => ['About image', 'image', null],
+        'Journey pages' => [
+            'journey_book_button' => ['Booking button text', 'text', null],
+            'journey_book_note' => ['Note under the booking button', 'text', null],
+            'journey_call_text' => ['Phone line beside the price', 'text', 'Shown before your second phone number. Leave empty to hide.'],
+            'booking_default_country' => ['Guests usually travel from', 'text', 'Pre-selected country on the booking form, e.g. “Canada”.'],
         ],
         'Contact' => [
-            'contact_phone' => ['Phone (Pakistan)', 'text', null],
-            'contact_phone_ca' => ['Phone (Canada)', 'text', null],
+            'contact_phone' => ['Main phone', 'text', null],
+            'label_phone_primary' => ['Main phone label', 'text', 'e.g. “Pakistan”.'],
+            'contact_phone_ca' => ['Second phone', 'text', 'Shown in the header on large screens.'],
+            'label_phone_secondary' => ['Second phone label', 'text', 'e.g. “Canada”.'],
             'contact_whatsapp' => ['WhatsApp number (digits only, with country code)', 'text', null],
             'contact_email' => ['Email', 'text', null],
             'contact_address' => ['Office address', 'textarea', null],

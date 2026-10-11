@@ -5,6 +5,7 @@ namespace Tests\Feature;
 use App\Models\Destination;
 use App\Models\MediaAsset;
 use App\Models\Package;
+use App\Models\Page;
 use App\Models\User;
 use App\Support\ImageImporter;
 use Illuminate\Foundation\Testing\RefreshDatabase;
@@ -42,7 +43,7 @@ class ImageImportTest extends TestCase
         $lahore = Destination::where('slug', 'lahore')->first();
         $this->assertStringStartsWith('media/', $lahore->image);
         Storage::disk('public')->assertExists($lahore->image);
-        $this->assertStringStartsWith('media/', setting('hero_image'));
+        $this->assertStringStartsWith('media/', Page::system('home')->sections()->where('type', 'hero')->first()->data['image']);
 
         // The failed download keeps its remote URL in the content and is reported.
         $hunza = Destination::where('slug', 'hunza-valley')->first();

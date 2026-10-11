@@ -5,6 +5,7 @@
         ['Bookings', 'admin.bookings.index', 'ticket', 'admin.bookings.*'],
         ['Enquiries', 'admin.inquiries.index', 'inbox', 'admin.inquiries.*'],
         null,
+        ['Pages', 'admin.pages.index', 'pencil', 'admin.pages.*'],
         ['Journeys', 'admin.packages.index', 'map-pin', 'admin.packages.*'],
         ['Destinations', 'admin.destinations.index', 'mountain', 'admin.destinations.*'],
         ['Stays', 'admin.hotels.index', 'bed', 'admin.hotels.*'],

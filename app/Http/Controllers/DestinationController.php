@@ -3,22 +3,15 @@
 namespace App\Http\Controllers;
 
 use App\Models\Destination;
+use App\Models\Page;
+use App\Support\PageBuilder;
+use Illuminate\View\View;
 
 class DestinationController extends Controller
 {
-    public function index()
+    public function index(PageBuilder $builder): View
     {
-        $destinations = Destination::withCount(['packages' => fn ($q) => $q->published()])->orderBy('sort_order')->get();
-
-        $multipleCountries = $destinations->pluck('country')->unique()->count() > 1;
-
-        return view('destinations.index', [
-            'regions' => $multipleCountries
-                ? $destinations->groupBy('country_name')->sortKeys()
-                : $destinations->groupBy(fn ($d) => $d->region ?: $d->country_name),
-            'multipleCountries' => $multipleCountries,
-            'count' => $destinations->count(),
-        ]);
+        return $builder->view(Page::system('destinations'));
     }
 
     public function show(Destination $destination)

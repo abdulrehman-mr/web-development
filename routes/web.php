@@ -79,4 +79,15 @@ Route::prefix('admin')->name('admin.')->middleware('auth')->group(function () {
     Route::put('payments', [Admin\PaymentSettingsController::class, 'update'])->name('payments.update');
     Route::get('settings', [Admin\SettingController::class, 'edit'])->name('settings.edit');
     Route::put('settings', [Admin\SettingController::class, 'update'])->name('settings.update');
+    Route::resource('pages', Admin\PageController::class)->except('show');
+    Route::post('pages/{page}/sections', [Admin\PageSectionController::class, 'store'])->name('pages.sections.store');
+    Route::get('pages/{page}/sections/{section}/edit', [Admin\PageSectionController::class, 'edit'])->scopeBindings()->name('pages.sections.edit');
+    Route::put('pages/{page}/sections/{section}', [Admin\PageSectionController::class, 'update'])->scopeBindings()->name('pages.sections.update');
+    Route::post('pages/{page}/sections/{section}/duplicate', [Admin\PageSectionController::class, 'duplicate'])->scopeBindings()->name('pages.sections.duplicate');
+    Route::patch('pages/{page}/sections/{section}/toggle', [Admin\PageSectionController::class, 'toggle'])->scopeBindings()->name('pages.sections.toggle');
+    Route::delete('pages/{page}/sections/{section}', [Admin\PageSectionController::class, 'destroy'])->scopeBindings()->name('pages.sections.destroy');
+    Route::put('pages/{page}/order', [Admin\PageSectionController::class, 'reorder'])->name('pages.sections.reorder');
 });
+
+// Pages made in Admin → Pages, e.g. /umrah-guide. Kept last so it never hides a built-in route.
+Route::get('/{page:slug}', [PageController::class, 'show'])->where('page', '[a-z0-9-]+')->name('pages.show');

@@ -5,12 +5,15 @@ namespace App\Http\Controllers;
 use App\Models\Category;
 use App\Models\Destination;
 use App\Models\Package;
+use App\Models\Page;
 use App\Models\Vibe;
+use App\Support\PageBuilder;
 use Illuminate\Http\Request;
+use Illuminate\View\View;
 
 class PackageController extends Controller
 {
-    public function index(Request $request)
+    public function index(Request $request, PageBuilder $builder): View
     {
         // The hero search sends one "where" field: a destination slug or "country:FR".
         if ($where = (string) $request->query('where')) {
@@ -50,15 +53,28 @@ class PackageController extends Controller
             ->paginate(9)
             ->withQueryString();
 
-        return view('packages.index', [
+        $activeCategory = Category::where('slug', $filters['category'] ?? null)->first();
+        $activeVibe = Vibe::where('slug', $filters['vibe'] ?? null)->first();
+        $activeCountry = isset($filters['country']) ? (config('countries')[strtoupper($filters['country'])] ?? null) : null;
+
+        // A filtered list retitles the page's hero, e.g. "Romantic" or "Journeys in France".
+        $heroOverride = ($activeCategory || $activeVibe || $activeCountry) ? [
+            'eyebrow' => $activeCategory ? 'Experience' : ($activeVibe ? 'Vibe' : 'Country'),
+            'title' => $activeCategory?->name ?? $activeVibe?->name ?? 'Journeys in '.$activeCountry,
+            'subtitle' => $activeCategory?->description ?? $activeVibe?->description,
+            'image' => $activeCategory?->image,
+        ] : [];
+
+        return $builder->view(Page::system('journeys'), [
             'packages' => $packages,
             'filters' => $filters,
             'categories' => Category::orderBy('sort_order')->get(),
             'destinations' => Destination::orderBy('name')->get(),
-            'activeCategory' => Category::where('slug', $filters['category'] ?? null)->first(),
-            'activeVibe' => Vibe::where('slug', $filters['vibe'] ?? null)->first(),
             'countries' => self::countriesWithJourneys(),
             'vibes' => Vibe::whereHas('packages', fn ($q) => $q->published())->orderBy('sort_order')->get(),
+            'heroOverride' => $heroOverride,
+            'title' => $heroOverride['title'] ?? null,
+            'description' => $heroOverride['subtitle'] ?? null,
         ]);
     }
 

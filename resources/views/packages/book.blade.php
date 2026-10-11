@@ -168,7 +168,7 @@
                                 <label for="phone" class="label">Phone / WhatsApp</label>
                                 <input id="phone" name="phone" value="{{ old('phone') }}" autocomplete="tel" class="field">
                             </div>
-                            <x-country-select label="Travelling from" value="Canada" class="sm:col-span-2"/>
+                            <x-country-select label="Travelling from" :value="setting('booking_default_country')" class="sm:col-span-2"/>
                             <div class="sm:col-span-2">
                                 <label for="special_requests" class="label">Anything we should know? <span class="font-normal text-slate-400">(optional)</span></label>
                                 <textarea id="special_requests" name="special_requests" rows="3" class="field" placeholder="Dietary needs, a village to visit, celebrations…">{{ old('special_requests') }}</textarea>

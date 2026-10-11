@@ -7,6 +7,7 @@ use App\Models\Destination;
 use App\Models\Hotel;
 use App\Models\Inquiry;
 use App\Models\Package;
+use App\Models\Page;
 use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Http\UploadedFile;
@@ -163,8 +164,8 @@ class SiteTest extends TestCase
     {
         $this->actingAs(User::first());
 
-        $this->put('/admin/settings', ['hero_title' => 'Discover Pakistan with us'])->assertSessionHas('status');
-        $this->get('/')->assertSee('Discover Pakistan with us');
+        $this->put('/admin/settings', ['footer_about' => 'Family-run since 2014', 'header_button_label' => 'Get a quote'])->assertSessionHas('status');
+        $this->get('/')->assertSee('Family-run since 2014')->assertSee('Get a quote');
 
         $booking = Package::first()->bookings()->create(['full_name' => 'A', 'email' => 'a@example.com', 'adults' => 1, 'start_date' => now()->addMonth()]);
         $this->put("/admin/bookings/{$booking->reference}", ['status' => 'confirmed', 'admin_notes' => 'Deposit received'])->assertSessionHas('status');
@@ -195,14 +196,17 @@ class SiteTest extends TestCase
     public function test_seeding_again_keeps_admin_password_and_site_content(): void
     {
         User::first()->update(['password' => bcrypt('my-new-password')]);
-        $this->actingAs(User::first())->put('/admin/settings', ['hero_title' => 'Our own headline']);
+        $this->actingAs(User::first())->put('/admin/settings', ['site_tagline' => 'Our own tagline']);
+        $hero = Page::system('home')->sections()->first();
+        $hero->update(['data' => ['title' => 'Our own headline'] + $hero->data]);
         $packages = Package::count();
 
         $this->artisan('db:seed', ['--force' => true])->assertSuccessful();
 
         $this->assertSame(1, User::count());
         $this->assertTrue(Hash::check('my-new-password', User::first()->password));
-        $this->assertSame('Our own headline', setting('hero_title'));
+        $this->assertSame('Our own tagline', setting('site_tagline'));
+        $this->assertSame('Our own headline', $hero->fresh()->data['title']);
         $this->assertSame($packages, Package::count());
     }
 }

@@ -15,7 +15,7 @@ use Illuminate\Http\Request;
 
 class CatalogController extends Controller
 {
-    /** Public site settings (contact details, hero copy) — never anything secret. */
+    /** Public site settings (contact details, header and footer text) — never anything secret. */
     public function settings()
     {
         $keys = collect(Setting::SCHEMA)->flatMap(fn ($fields) => array_keys($fields));

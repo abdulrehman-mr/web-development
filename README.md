@@ -21,7 +21,8 @@ A premium, responsive travel website for a Pakistan tour operator that serves gu
 - **Destinations**, **Stays (hotels)**, **Experiences (categories)**, **Reviews**, **FAQs:** add, edit and delete
 - **Bookings:** filter by status, search, change status, add a quoted total and internal notes, and email or WhatsApp the guest
 - **Enquiries** inbox with read/unread state
-- **Site content:** hero text and image, story, stats, about page, contact details, social links and logo
+- **Pages:** a section builder for every page (see below), plus your own pages such as `/umrah-guide`
+- **Site content:** logo, menu links, header button, footer text, journey-page labels, contact details and social links
 - **Currencies:** all 166 ISO 4217 currencies. Choose which currency prices are entered in (the base), the default currency for visitors and an optional "about CA$…" second price. Enable the currencies visitors can switch to, and edit each symbol and its position. Exchange rates update daily, from the "Update rates now" button, or by hand.
 - **Payments:** Stripe, PayPal, Authorize.net, 2Checkout and CoinPayments, each with on/off, test/live mode and encrypted keys. Set the deposit percentage, then copy or email a secure payment link from any booking.
 - **Appearance:** six colour schemes (Pakistan Green, Indus Blue, Karakoram Teal, Truck Art Red, Royal Violet, Midnight Slate) or your own two colours, with a live preview
@@ -39,6 +40,36 @@ A premium, responsive travel website for a Pakistan tour operator that serves gu
 | POST | `/inquiries` | `name`, `email`, `message`, … |
 
 The POST endpoints are rate-limited.
+
+## Pages and sections
+
+**Admin → Pages** lists the built-in pages (Home, Journeys, Destinations, Stays, About, Contact) and any pages you create. Each page is a stack of sections that you can add, remove, hide, duplicate, drag into order and edit. Every section's text, links, photos and colours are editable.
+
+The section types are:
+- Hero
+- Experiences, Travel vibes, Journeys, Journey spotlight, Destinations
+- Image & text, Text, Icon grid, Steps
+- Reviews, FAQs, Photo gallery, Video, Call to action, Contact form
+- All destinations, All stays, Journey search & results (Journeys page only)
+
+**Hero options:**
+- Layout:
+  - photo or video behind the text
+  - text beside a photo (left or right)
+  - slideshow
+  - photo collage
+  - photo with destination, journey or experience cards
+  - compact page banner
+- Width and height: full width or boxed; fit content, medium, large or full screen.
+- Text position: left, centre or right, and top, middle or bottom.
+- Background media: a photo, an uploaded MP4/WebM video, or a YouTube or Vimeo link. Videos play muted on a loop.
+- Shade over the photo: even, fading from the bottom, fading from the text side, or dark edges. Choose its colour and strength.
+- Photo shape: square, rounded, arch, circle, blob, leaf or tilted card. The bottom edge can be straight, curved, wavy or slanted.
+- Menu over the hero: the menu turns see-through until the visitor scrolls.
+- Search: a card of dropdowns, a one-line bar or a keyword box, with optional quick-filter tabs for experiences, vibes or countries.
+- Text and trust: buttons, a trust line with stars, and small selling points.
+
+The section editor shows a live preview of the page at desktop or phone width, refreshed each time you save. Uploaded videos must fit your server's PHP upload limit (`upload_max_filesize` and `post_max_size`).
 
 ## Content packs, countries and vibes
 

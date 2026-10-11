@@ -72,6 +72,11 @@ class ImageImporter
                 MediaAsset::register($value);
             }
         }
+        foreach (app(PageBuilder::class)->imageFields() as [$section, $path]) {
+            if (MediaAsset::isImportable($value = data_get($section->data, $path))) {
+                MediaAsset::register($value);
+            }
+        }
 
         return MediaAsset::count() - $before;
     }
@@ -189,6 +194,16 @@ class ImageImporter
         if ($settings) {
             Setting::put($settings);
             $changed += count($settings);
+        }
+
+        foreach (app(PageBuilder::class)->imageFields() as [$section, $path]) {
+            $value = data_get($section->data, $path);
+            if (is_string($value) && isset($map[$value])) {
+                $data = $section->data;
+                data_set($data, $path, $map[$value]);
+                $section->forceFill(['data' => $data])->saveQuietly();
+                $changed++;
+            }
         }
 
         return $changed;

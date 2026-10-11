@@ -22,6 +22,32 @@ document.addEventListener('DOMContentLoaded', () => {
     items.forEach((el) => io.observe(el));
 });
 
+// Hero slideshow: crossfades slides, pauses on hover and for reduced motion.
+Alpine.data('heroSlider', (count, seconds) => ({
+    active: 0,
+    timer: null,
+    init() {
+        this.play();
+    },
+    play() {
+        this.pause();
+        if (count < 2 || seconds <= 0 || window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+        this.timer = setInterval(() => this.next(), seconds * 1000);
+    },
+    pause() {
+        clearInterval(this.timer);
+    },
+    go(index) {
+        this.active = (index + count) % count;
+    },
+    next() {
+        this.go(this.active + 1);
+    },
+    prev() {
+        this.go(this.active - 1);
+    },
+}));
+
 // Searchable country picker used by booking and contact forms.
 Alpine.data('countrySelect', (countries, popular, selected) => ({
     countries,

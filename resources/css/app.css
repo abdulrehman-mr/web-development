@@ -51,6 +51,7 @@
 
     .eyebrow { @apply text-sm font-semibold text-brand-700; }
     .heading-xl { @apply font-display text-[2.5rem] leading-[1.04] font-extrabold tracking-[-0.035em] sm:text-6xl lg:text-[4.25rem]; }
+    .heading-2xl { @apply font-display text-[2.75rem] leading-[1] font-extrabold tracking-[-0.04em] sm:text-7xl lg:text-[5.75rem]; }
     .heading-lg { @apply font-display text-3xl leading-[1.1] font-bold tracking-[-0.025em] sm:text-[2.6rem]; }
     .heading-md { @apply font-display text-2xl leading-tight font-bold tracking-tight sm:text-3xl; }
 
@@ -69,6 +70,12 @@
         mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 140' preserveAspectRatio='none'%3E%3Cpath d='M0 140V46C0 22 24 10 40 5 46 3 49 1 50 0c1 1 4 3 10 5 16 5 40 17 40 41v94Z'/%3E%3C/svg%3E") center / 100% 100% no-repeat;
     }
 
+    /* Soft organic blob, one of the hero and image-and-text photo shapes. */
+    .mask-blob {
+        -webkit-mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 200 200' preserveAspectRatio='none'%3E%3Cpath d='M43 20C66 2 108-4 140 10s56 44 58 80-10 72-40 92-74 22-106 6S-2 140 1 102 20 38 43 20Z'/%3E%3C/svg%3E") center / 100% 100% no-repeat;
+        mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 200 200' preserveAspectRatio='none'%3E%3Cpath d='M43 20C66 2 108-4 140 10s56 44 58 80-10 72-40 92-74 22-106 6S-2 140 1 102 20 38 43 20Z'/%3E%3C/svg%3E") center / 100% 100% no-repeat;
+    }
+
     /* Shown behind every photo, so a missing image still looks intentional. */
     .media-fallback { background-image: linear-gradient(140deg, var(--color-brand-800), var(--color-lake-800)); }
 
@@ -81,3 +88,18 @@
 
 /* Lift the WhatsApp button above the mobile booking bar on journey pages. */
 @media (max-width: 1023px) { body:has(#mobile-book-bar) .wa-float { bottom: 5.5rem; } }
+
+/* Page-builder sections: two in a row with the same background share one gap. */
+.builder-section[data-bg="white"] + .builder-section[data-bg="white"],
+.builder-section[data-bg="light"] + .builder-section[data-bg="light"],
+.builder-section[data-bg="tint"] + .builder-section[data-bg="tint"],
+.builder-section[data-bg="dark"] + .builder-section[data-bg="dark"] { padding-top: 0; }
+
+/* Header floating over a photo hero, until the visitor scrolls. */
+.site-header.is-clear { background-color: transparent; box-shadow: none; backdrop-filter: none; }
+.site-header.is-clear .hdr-logo { color: #fff; }
+.site-header.is-clear .hdr-logo svg { color: #fff; }
+.site-header.is-clear .hdr-link { color: rgb(255 255 255 / 0.92); background-color: transparent; }
+.site-header.is-clear .hdr-link:hover { color: #fff; background-color: rgb(255 255 255 / 0.12); }
+.site-header.is-clear .hdr-ring { color: #fff; background-color: transparent; --tw-ring-color: rgb(255 255 255 / 0.4); }
+.site-header.is-clear .hdr-cta { background-color: #fff; color: var(--color-brand-900); }
