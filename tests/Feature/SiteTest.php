@@ -10,6 +10,7 @@ use App\Models\Package;
 use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Http\UploadedFile;
+use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Storage;
 use Tests\TestCase;
 
@@ -189,5 +190,19 @@ class SiteTest extends TestCase
 
         $this->postJson('/api/v1/bookings', ['package' => 'nope'])->assertUnprocessable();
         $this->postJson('/api/v1/inquiries', ['name' => 'X', 'email' => 'x@example.com', 'message' => 'Hello'])->assertCreated();
+    }
+
+    public function test_seeding_again_keeps_admin_password_and_site_content(): void
+    {
+        User::first()->update(['password' => bcrypt('my-new-password')]);
+        $this->actingAs(User::first())->put('/admin/settings', ['hero_title' => 'Our own headline']);
+        $packages = Package::count();
+
+        $this->artisan('db:seed', ['--force' => true])->assertSuccessful();
+
+        $this->assertSame(1, User::count());
+        $this->assertTrue(Hash::check('my-new-password', User::first()->password));
+        $this->assertSame('Our own headline', setting('hero_title'));
+        $this->assertSame($packages, Package::count());
     }
 }

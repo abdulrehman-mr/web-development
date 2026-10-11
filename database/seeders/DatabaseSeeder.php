@@ -2,18 +2,26 @@
 
 namespace Database\Seeders;
 
+use App\Models\Package;
 use App\Models\User;
 use App\Support\ImageImporter;
 use Illuminate\Database\Seeder;
 
 class DatabaseSeeder extends Seeder
 {
+    /**
+     * Safe to run on every deploy: the admin account and sample content are only
+     * created once, so later runs never reset the password or overwrite edits.
+     */
     public function run(): void
     {
-        User::updateOrCreate(
-            ['email' => 'admin@safarnama.test'],
-            ['name' => 'Site Admin', 'password' => bcrypt('password')]
-        );
+        if (! User::exists()) {
+            User::create(['name' => 'Site Admin', 'email' => 'admin@safarnama.test', 'password' => bcrypt('password')]);
+        }
+
+        if (Package::exists()) {
+            return;
+        }
 
         $this->call([
             SettingSeeder::class,

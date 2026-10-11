@@ -59,15 +59,29 @@ Exchange rates update daily through Laravel's scheduler, so add the standard cro
 
 ## Getting started
 
+Three commands, for local use or any hosting platform that asks for install, build and run steps:
+
+**Install** (dependencies only; no database or `.env` needed)
 ```bash
-composer install
-cp .env.example .env && php artisan key:generate
-touch database/database.sqlite          # or set DB_* in .env for MySQL
-php artisan migrate --seed
-php artisan storage:link
-npm install && npm run build            # or `npm run dev` while developing
-php artisan serve
+composer install --no-dev --optimize-autoloader --no-interaction && npm ci
 ```
+
+**Build**
+```bash
+npm run build
+```
+
+**Run** (prepares `.env`, migrates, seeds sample content on the first start only, then serves)
+```bash
+([ -f .env ] || cp .env.example .env) && (grep -q '^APP_KEY=base64' .env || php artisan key:generate --force) && ([ -f database/database.sqlite ] || touch database/database.sqlite) && php artisan migrate --force --seed && php artisan storage:link --force && php artisan optimize && (php artisan images:import > storage/logs/images.log 2>&1 &) && php artisan serve --host=0.0.0.0 --port=${PORT:-8000}
+```
+
+The run command is safe to repeat. Seeding never resets the admin password or overwrites content you've edited. Missing images download in the background.
+
+For a real server:
+- Set `APP_ENV=production`, `APP_DEBUG=false` and `APP_URL` as environment variables or in `.env`.
+- Use MySQL or Postgres (`DB_CONNECTION`, `DB_HOST`, …), or keep `database/database.sqlite` and `storage/` on a persistent disk so data survives redeploys.
+- Serve `public/` with Nginx/Apache and PHP-FPM rather than `php artisan serve` for heavy traffic.
 
 Open http://127.0.0.1:8000 for the website and http://127.0.0.1:8000/admin for the admin panel.
 
