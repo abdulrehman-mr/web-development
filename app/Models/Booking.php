@@ -16,12 +16,12 @@ class Booking extends Model
     protected $fillable = [
         'reference', 'package_id', 'full_name', 'email', 'phone', 'country', 'adults', 'children',
         'start_date', 'room_preference', 'special_requests', 'total_estimate', 'status', 'admin_notes',
-        'currency', 'exchange_rate', 'amount_paid', 'payment_status',
+        'currency', 'exchange_rate', 'amount_paid', 'payment_status', 'room_type_id', 'extras', 'price_breakdown',
     ];
 
     protected function casts(): array
     {
-        return ['start_date' => 'date', 'total_estimate' => 'decimal:2', 'exchange_rate' => 'float', 'amount_paid' => 'decimal:2'];
+        return ['start_date' => 'date', 'total_estimate' => 'decimal:2', 'exchange_rate' => 'float', 'amount_paid' => 'decimal:2', 'extras' => 'array', 'price_breakdown' => 'array'];
     }
 
     protected static function booted(): void

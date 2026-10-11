@@ -9,6 +9,7 @@
         ['Destinations', 'admin.destinations.index', 'mountain', 'admin.destinations.*'],
         ['Stays', 'admin.hotels.index', 'bed', 'admin.hotels.*'],
         ['Experiences', 'admin.categories.index', 'tag', 'admin.categories.*'],
+        ['Room types', 'admin.room-types.edit', 'bed', 'admin.room-types.*'],
         null,
         ['Reviews', 'admin.testimonials.index', 'quote', 'admin.testimonials.*'],
         ['FAQs', 'admin.faqs.index', 'help', 'admin.faqs.*'],

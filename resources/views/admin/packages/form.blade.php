@@ -4,6 +4,11 @@
         ->map(fn ($d) => array_merge($d, ['hotel_id' => (string) ($d['hotel_id'] ?? '')]))->values()->all();
     $selectedDestinations = collect(old('destination_ids', $package->destinations->pluck('id')->all()))->map(fn ($id) => (int) $id)->all();
     $lines = fn ($field) => old($field, implode("\n", $package->{$field} ?? []));
+    $tiers = old('tiers', $package->group_tiers ?? []);
+    $extras = old('extras', $package->extras ?? []);
+    $roomOptions = $package->room_options ?? [];
+    $defaultRoom = (int) old('default_room_type_id', $package->default_room_type_id ?? $roomTypes->first()?->id);
+    $base = currencies()->base()->code;
 @endphp
 <x-admin-layout :title="$editing ? 'Edit journey' : 'New journey'">
     <x-slot:actions>
@@ -23,6 +28,70 @@
                     <x-admin.input name="title" label="Title" :value="$package->title" required class="sm:col-span-2"/>
                     <x-admin.textarea name="summary" label="Short summary" :value="$package->summary" rows="2" help="Shown on journey cards (max 500 characters)." class="sm:col-span-2"/>
                     <x-admin.textarea name="overview" label="Overview" :value="$package->overview" rows="6" help="Leave a blank line between paragraphs." class="sm:col-span-2"/>
+                </div>
+            </x-admin.card>
+
+            {{-- Prices & options --}}
+            <x-admin.card title="Prices & options" :description="'All prices in '.$base.'. Guests see them converted to their currency.'">
+                <div class="grid gap-4 sm:grid-cols-2">
+                    <x-admin.input name="child_price" type="number" step="1" min="0" label="Child price (age 2–11)" :value="$package->child_price" :help="'Leave blank to charge '.(int) (\App\Support\BookingPricing::CHILD_RATE * 100).'% of the adult price.'"/>
+                </div>
+
+                {{-- Group tiers --}}
+                <div class="mt-6" x-data="{ tiers: @js(array_values($tiers)) }">
+                    <p class="text-sm font-semibold text-slate-900">Group prices</p>
+                    <p class="text-xs text-slate-500">Lower the adult price when a booking has at least this many travellers (adults + children).</p>
+                    <div class="mt-3 space-y-2">
+                        <template x-for="(tier, i) in tiers" :key="i">
+                            <div class="flex flex-wrap items-center gap-2">
+                                <span class="text-sm text-slate-600">From</span>
+                                <input type="number" min="2" :name="`tiers[${i}][min]`" x-model="tier.min" class="field w-20 px-2 py-2" aria-label="Minimum travellers" required>
+                                <span class="text-sm text-slate-600">travellers:</span>
+                                <input type="number" min="0" step="1" :name="`tiers[${i}][price]`" x-model="tier.price" class="field w-32 px-2 py-2" aria-label="Price per adult" required>
+                                <span class="text-sm text-slate-600">per adult</span>
+                                <button type="button" @click="tiers.splice(i, 1)" class="ml-auto rounded-lg p-2 text-rose-600 hover:bg-rose-50" aria-label="Remove group price"><x-icon name="trash" class="size-4"/></button>
+                            </div>
+                        </template>
+                    </div>
+                    <button type="button" @click="tiers.push({ min: tiers.length ? Number(tiers[tiers.length - 1].min) + 4 : 6, price: '' })" class="btn btn-ghost mt-3 py-2"><x-icon name="plus" class="size-4"/>Add group price</button>
+                </div>
+
+                {{-- Rooms --}}
+                <div class="mt-6">
+                    <p class="text-sm font-semibold text-slate-900">Room options</p>
+                    <p class="text-xs text-slate-500">Tick the rooms offered on this journey and set the price change per adult (negative for a discount). Manage the list in <a href="{{ route('admin.room-types.edit') }}" class="underline">Room types</a>.</p>
+                    <div class="mt-3 divide-y divide-slate-100 rounded-xl ring-1 ring-slate-200">
+                        @foreach ($roomTypes as $type)
+                            @php $option = $roomOptions[$type->id] ?? null; @endphp
+                            <div class="flex flex-wrap items-center gap-3 p-3">
+                                <label class="flex min-w-0 flex-1 items-center gap-3">
+                                    <input type="checkbox" name="rooms[{{ $type->id }}][enabled]" value="1" @checked($option === null || ($option['enabled'] ?? false)) class="size-4 accent-brand-700">
+                                    <span class="min-w-0"><span class="block text-sm font-medium text-slate-900">{{ $type->name }}</span><span class="block truncate text-xs text-slate-500">{{ $type->description }}</span></span>
+                                </label>
+                                <input type="number" step="1" name="rooms[{{ $type->id }}][adjustment]" value="{{ $option['adjustment'] ?? '' }}" placeholder="{{ $type->default_adjustment + 0 }}" class="field w-28 px-2 py-2" aria-label="{{ $type->name }} price change per adult">
+                                <label class="flex items-center gap-1.5 text-xs text-slate-600"><input type="radio" name="default_room_type_id" value="{{ $type->id }}" @checked($defaultRoom === $type->id) class="accent-brand-700"> Default</label>
+                            </div>
+                        @endforeach
+                    </div>
+                    <p class="mt-1 text-xs text-slate-500">Leave the price blank to use the room type’s standard price shown in grey.</p>
+                </div>
+
+                {{-- Extras --}}
+                <div class="mt-6" x-data="{ extras: @js(array_values($extras)) }">
+                    <p class="text-sm font-semibold text-slate-900">Optional extras</p>
+                    <p class="text-xs text-slate-500">Add-ons guests can tick when booking, like an upgrade, a domestic flight or a photographer.</p>
+                    <div class="mt-3 space-y-3">
+                        <template x-for="(extra, i) in extras" :key="i">
+                            <div class="grid gap-2 rounded-xl bg-slate-50 p-3 ring-1 ring-slate-200 sm:grid-cols-[1fr_8rem_9rem_auto]">
+                                <input :name="`extras[${i}][name]`" x-model="extra.name" placeholder="Name, e.g. Upgrade to 5-star hotels" class="field py-2" required>
+                                <input type="number" step="1" :name="`extras[${i}][price]`" x-model="extra.price" placeholder="Price" class="field py-2" required>
+                                <select :name="`extras[${i}][per]`" x-model="extra.per" class="field py-2"><option value="person">per person</option><option value="booking">per booking</option></select>
+                                <button type="button" @click="extras.splice(i, 1)" class="rounded-lg p-2 text-rose-600 hover:bg-rose-50" aria-label="Remove extra"><x-icon name="trash" class="size-4"/></button>
+                                <input :name="`extras[${i}][description]`" x-model="extra.description" placeholder="Short description (optional)" class="field py-2 sm:col-span-4">
+                            </div>
+                        </template>
+                    </div>
+                    <button type="button" @click="extras.push({ name: '', price: '', per: 'person', description: '' })" class="btn btn-ghost mt-3 py-2"><x-icon name="plus" class="size-4"/>Add extra</button>
                 </div>
             </x-admin.card>
 

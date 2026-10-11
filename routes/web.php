@@ -21,6 +21,7 @@ Route::get('/stays', [PageController::class, 'stays'])->name('stays');
 Route::get('/about', [PageController::class, 'about'])->name('about');
 Route::get('/contact', [PageController::class, 'contact'])->name('contact');
 Route::post('/contact', [PageController::class, 'sendContact'])->middleware('throttle:6,1')->name('contact.send');
+Route::get('/journeys/{package}/book', [BookingController::class, 'create'])->name('packages.book');
 Route::post('/journeys/{package}/book', [BookingController::class, 'store'])->middleware('throttle:6,1')->name('bookings.store');
 Route::get('/booking/{booking}', [BookingController::class, 'show'])->name('bookings.show');
 Route::get('/booking/{booking}/pay', [PaymentController::class, 'show'])->name('bookings.pay');
@@ -51,6 +52,8 @@ Route::prefix('admin')->name('admin.')->middleware('auth')->group(function () {
     Route::post('media/scan', [Admin\MediaController::class, 'scan'])->name('media.scan');
     Route::post('media/import', [Admin\MediaController::class, 'import'])->name('media.import');
     Route::delete('media/{medium}', [Admin\MediaController::class, 'destroy'])->name('media.destroy');
+    Route::get('room-types', [Admin\RoomTypeController::class, 'edit'])->name('room-types.edit');
+    Route::put('room-types', [Admin\RoomTypeController::class, 'update'])->name('room-types.update');
     Route::get('currencies', [Admin\CurrencyController::class, 'index'])->name('currencies.index');
     Route::put('currencies', [Admin\CurrencyController::class, 'update'])->name('currencies.update');
     Route::post('currencies/rates', [Admin\CurrencyController::class, 'refreshRates'])->name('currencies.rates');

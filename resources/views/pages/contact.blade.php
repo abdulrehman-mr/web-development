@@ -48,10 +48,7 @@
                             <label for="phone" class="label">Phone / WhatsApp</label>
                             <input id="phone" name="phone" value="{{ old('phone') }}" autocomplete="tel" class="field">
                         </div>
-                        <div>
-                            <label for="country" class="label">Travelling from</label>
-                            <input id="country" name="country" value="{{ old('country') }}" autocomplete="country-name" class="field" placeholder="e.g. Canada">
-                        </div>
+                        <x-country-select label="Travelling from"/>
                         <div class="sm:col-span-2">
                             <label for="subject" class="label">I’m interested in</label>
                             <select id="subject" name="subject" class="field">

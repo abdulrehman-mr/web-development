@@ -1,10 +1,8 @@
 <x-site-layout :title="$package->title" :description="$package->summary">
     @php
         $stays = $package->stays();
-        $display = currencies()->current();
-        $displayRate = currencies()->rate($display) ?: 1;
-        $secondary = currencies()->secondary();
-        $childRate = \App\Http\Controllers\BookingController::CHILD_RATE;
+        $pricing = app(\App\Support\BookingPricing::class);
+        $rooms = $pricing->rooms($package);
     @endphp
 
     {{-- Hero --}}
@@ -193,87 +191,38 @@
 
         {{-- Booking panel --}}
         <aside class="min-w-0 lg:col-span-5 xl:col-span-4" id="book">
-            <div class="lg:sticky lg:top-24"
-                 x-data="{ adults: {{ (int) old('adults', 2) }}, children: {{ (int) old('children', 0) }}, price: {{ (float) $package->price }}, childRate: {{ $childRate }},
-                           rate: {{ $displayRate }}, symbol: @js($display->symbol), after: {{ $display->symbol_position === 'after' ? 'true' : 'false' }},
-                           secondaryRate: {{ $secondary ? currencies()->rate($secondary) : 0 }}, secondarySymbol: @js($secondary?->symbol),
-                           get total() { return this.price * (this.adults + this.children * this.childRate) },
-                           fmt(n, symbol, after) { const v = Math.round(n).toLocaleString('en-US'); return after ? v + ' ' + symbol : symbol + v } }}">
-                <div class="rounded-3xl bg-white p-6 shadow-[0_30px_80px_-40px_rgb(8_26_22/0.45)] ring-1 ring-slate-200 sm:p-8">
-                    <p class="text-xs font-medium text-ink/50">From</p>
-                    <x-price :amount="$package->price" :original="$package->original_price" size="lg"/>
+            <div class="rounded-2xl bg-white p-6 shadow-[0_24px_60px_-30px_rgb(15_23_42/0.35)] ring-1 ring-slate-200 sm:p-7 lg:sticky lg:top-24">
+                <p class="text-xs font-medium text-slate-500">From</p>
+                <x-price :amount="$package->price" :original="$package->original_price" size="lg"/>
 
-                    <form method="post" action="{{ route('bookings.store', $package) }}" class="mt-6 space-y-4">
-                        @csrf
-                        @if ($errors->any())
-                            <div class="rounded-xl bg-rose-500/10 p-3 text-sm text-rose-600" role="alert">Please check the highlighted fields.</div>
-                        @endif
-                        <div>
-                            <label for="start_date" class="label">Preferred start date</label>
-                            <input type="date" id="start_date" name="start_date" value="{{ old('start_date') }}" min="{{ now()->addDay()->toDateString() }}" required class="field">
-                            @error('start_date')<p class="mt-1 text-xs text-rose-600">{{ $message }}</p>@enderror
-                        </div>
-                        <div class="grid grid-cols-2 gap-3">
-                            @foreach (['adults' => ['Adults', 1], 'children' => ['Children (2–11)', 0]] as $field => [$label, $min])
-                                <div>
-                                    <span class="label">{{ $label }}</span>
-                                    <div class="flex items-center justify-between rounded-xl border border-slate-300 bg-white p-1.5">
-                                        <button type="button" @click="{{ $field }} = Math.max({{ $min }}, {{ $field }} - 1)" class="grid size-9 place-items-center rounded-lg text-lg text-slate-900 hover:bg-slate-100" aria-label="Fewer {{ strtolower($label) }}">−</button>
-                                        <input type="number" name="{{ $field }}" x-model.number="{{ $field }}" min="{{ $min }}" max="40" class="w-10 bg-transparent text-center font-semibold outline-none [appearance:textfield] [&::-webkit-inner-spin-button]:appearance-none" aria-label="{{ $label }}">
-                                        <button type="button" @click="{{ $field }} = Math.min(40, {{ $field }} + 1)" class="grid size-9 place-items-center rounded-lg text-lg text-slate-900 hover:bg-slate-100" aria-label="More {{ strtolower($label) }}">+</button>
-                                    </div>
-                                </div>
+                <dl class="mt-5 space-y-2.5 border-t border-slate-100 pt-4 text-sm">
+                    <div class="flex justify-between gap-4"><dt class="text-slate-500">Adult (12+)</dt><dd class="font-semibold text-slate-900">{{ money($package->price) }}</dd></div>
+                    <div class="flex justify-between gap-4"><dt class="text-slate-500">Child (2–11)</dt><dd class="font-semibold text-slate-900">{{ money($pricing->childPrice($package, 1)) }}</dd></div>
+                    @foreach ($pricing->tiers($package) as $tier)
+                        <div class="flex justify-between gap-4"><dt class="text-slate-500">Group of {{ $tier['min'] }}+</dt><dd class="font-semibold text-brand-700">{{ money($tier['price']) }} per adult</dd></div>
+                    @endforeach
+                </dl>
+
+                @if ($rooms->isNotEmpty())
+                    <div class="mt-4 border-t border-slate-100 pt-4">
+                        <p class="text-sm font-semibold text-slate-900">Room options</p>
+                        <ul class="mt-2 space-y-1.5 text-sm">
+                            @foreach ($rooms as $room)
+                                <li class="flex justify-between gap-4">
+                                    <span class="text-slate-600">{{ $room['name'] }}</span>
+                                    <span class="shrink-0 font-medium {{ $room['adjustment'] < 0 ? 'text-brand-700' : 'text-slate-900' }}">{{ $room['adjustment'] == 0 ? 'Included' : ($room['adjustment'] > 0 ? '+ ' : '− ').money(abs($room['adjustment'])) }}</span>
+                                </li>
                             @endforeach
-                        </div>
-                        <div>
-                            <label for="full_name" class="label">Full name</label>
-                            <input id="full_name" name="full_name" value="{{ old('full_name') }}" required autocomplete="name" class="field">
-                            @error('full_name')<p class="mt-1 text-xs text-rose-600">{{ $message }}</p>@enderror
-                        </div>
-                        <div>
-                            <label for="email" class="label">Email</label>
-                            <input id="email" type="email" name="email" value="{{ old('email') }}" required autocomplete="email" class="field">
-                            @error('email')<p class="mt-1 text-xs text-rose-600">{{ $message }}</p>@enderror
-                        </div>
-                        <div class="grid grid-cols-2 gap-3">
-                            <div>
-                                <label for="phone" class="label">Phone / WhatsApp</label>
-                                <input id="phone" name="phone" value="{{ old('phone') }}" autocomplete="tel" class="field">
-                            </div>
-                            <div>
-                                <label for="country" class="label">Travelling from</label>
-                                <input id="country" name="country" value="{{ old('country', 'Canada') }}" autocomplete="country-name" class="field">
-                            </div>
-                        </div>
-                        <div>
-                            <label for="room_preference" class="label">Rooms</label>
-                            <select id="room_preference" name="room_preference" class="field">
-                                @foreach (['Twin sharing', 'Double', 'Single rooms', 'Family rooms'] as $opt)
-                                    <option @selected(old('room_preference') === $opt)>{{ $opt }}</option>
-                                @endforeach
-                            </select>
-                        </div>
-                        <div>
-                            <label for="special_requests" class="label">Anything we should know? <span class="font-normal text-ink/40">(optional)</span></label>
-                            <textarea id="special_requests" name="special_requests" rows="3" class="field" placeholder="Dietary needs, a village to visit, celebrations…">{{ old('special_requests') }}</textarea>
-                        </div>
+                        </ul>
+                    </div>
+                @endif
 
-                        <div class="rounded-2xl bg-slate-100 p-4">
-                            <div class="flex items-baseline justify-between">
-                                <span class="text-sm text-ink/70">Estimated total</span>
-                                <span class="text-3xl font-bold tracking-tight text-slate-900" x-text="fmt(total * rate, symbol, after)">{{ money($package->price * 2) }}</span>
-                            </div>
-                            <p class="mt-1 text-right text-xs text-ink/50" x-show="secondaryRate > 0" x-text="'about ' + fmt(total * secondaryRate, secondarySymbol, false)"></p>
-                        </div>
-
-                        <button class="btn btn-primary w-full py-4 text-base">Request this journey</button>
-                        <p class="text-center text-xs leading-relaxed text-ink/50">No payment now. We confirm availability within 24 hours, then a 25% deposit secures your dates.</p>
-                    </form>
-                </div>
-                <div class="mt-4 flex items-center gap-3 rounded-2xl bg-brand-50 p-4 text-sm text-slate-900">
-                    <x-icon name="phone" class="size-5 shrink-0 text-brand-600"/>
-                    <p>Prefer to talk? Call our Toronto desk on <span class="font-semibold whitespace-nowrap">{{ setting('contact_phone_ca') }}</span></p>
-                </div>
+                <a href="{{ route('packages.book', $package) }}" class="btn btn-primary mt-6 w-full py-4 text-base">Choose dates & options</a>
+                <p class="mt-3 text-center text-xs leading-relaxed text-slate-500">No payment now. We confirm availability within 24 hours.</p>
+            </div>
+            <div class="mt-4 flex items-center gap-3 rounded-2xl bg-brand-50 p-4 text-sm text-brand-900">
+                <x-icon name="phone" class="size-5 shrink-0 text-brand-600"/>
+                <p>Prefer to talk? Call our Toronto desk on <span class="font-semibold whitespace-nowrap">{{ setting('contact_phone_ca') }}</span></p>
             </div>
         </aside>
     </div>
@@ -298,7 +247,7 @@
             <p class="text-[0.7rem] text-ink/50">From, per person</p>
             <p class="text-2xl font-bold tracking-tight text-slate-900">{{ money($package->price) }}</p>
         </div>
-        <a href="#book" class="btn btn-primary">Request to book</a>
+        <a href="{{ route('packages.book', $package) }}" class="btn btn-primary">Book now</a>
     </div>
     <div class="h-20 lg:hidden"></div>
 </x-site-layout>

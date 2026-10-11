@@ -45,7 +45,8 @@ class SiteTest extends TestCase
 
     public function test_visitor_can_request_a_booking(): void
     {
-        $package = Package::where('price', '>', 0)->first();
+        $package = Package::where('title', 'Cholistan: Palaces & Desert Forts')->firstOrFail();
+        $this->get("/journeys/{$package->slug}/book")->assertOk()->assertSee('Choose your room');
 
         $response = $this->post("/journeys/{$package->slug}/book", [
             'full_name' => 'Harpreet Kaur',
@@ -54,7 +55,6 @@ class SiteTest extends TestCase
             'adults' => 2,
             'children' => 1,
             'start_date' => now()->addMonths(2)->toDateString(),
-            'room_preference' => 'Family rooms',
         ]);
 
         $booking = Booking::firstOrFail();

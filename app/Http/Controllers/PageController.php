@@ -7,6 +7,7 @@ use App\Models\Hotel;
 use App\Models\Inquiry;
 use App\Models\Testimonial;
 use Illuminate\Http\Request;
+use Illuminate\Validation\Rule;
 
 class PageController extends Controller
 {
@@ -42,7 +43,7 @@ class PageController extends Controller
             'name' => 'required|string|max:120',
             'email' => 'required|email|max:160',
             'phone' => 'nullable|string|max:40',
-            'country' => 'nullable|string|max:80',
+            'country' => ['nullable', 'string', Rule::in(array_values(config('countries')))],
             'subject' => 'nullable|string|max:160',
             'message' => 'required|string|max:5000',
         ]));

@@ -235,6 +235,31 @@ class TravelSeeder extends Seeder
             }
         }
 
+        // ── Prices & options ────────────────────────────────────────
+        $commonExtras = [
+            ['name' => 'Pakistan SIM card with 30 GB data', 'description' => 'Ready at the airport so you can WhatsApp home straight away.', 'price' => 15, 'per' => 'person'],
+            ['name' => 'Private photographer for a day', 'description' => 'A local photographer joins you for one full day of the journey.', 'price' => 250, 'per' => 'booking'],
+        ];
+        $options = [
+            'Footsteps of Guru Nanak: Sikh Yatra' => ['child' => 1450, 'tiers' => [['min' => 6, 'price' => 2290], ['min' => 12, 'price' => 2150]], 'extras' => [
+                ['name' => 'Visit to your ancestral village', 'description' => 'An extra day with a private car and a researcher who helps locate the village beforehand.', 'price' => 180, 'per' => 'booking'],
+            ]],
+            'Hunza & the Karakoram Highway' => ['child' => null, 'tiers' => [['min' => 6, 'price' => 2690]], 'extras' => [
+                ['name' => 'Fly Islamabad ↔ Gilgit', 'description' => 'Swap the two long drive days for the scenic mountain flight (weather permitting).', 'price' => 260, 'per' => 'person'],
+            ]],
+            'Mughal Lahore & the Grand Trunk Road' => ['child' => 990, 'tiers' => [['min' => 8, 'price' => 1550]], 'extras' => [
+                ['name' => 'All Lahore nights in the haveli', 'description' => 'Stay every night in the Walled City haveli instead of the city hotel.', 'price' => 140, 'per' => 'person'],
+            ]],
+        ];
+        foreach (Package::all() as $package) {
+            $option = $options[$package->title] ?? ['child' => null, 'tiers' => [], 'extras' => []];
+            $package->update([
+                'child_price' => $option['child'],
+                'group_tiers' => $option['tiers'],
+                'extras' => [...$option['extras'], ...$commonExtras],
+            ]);
+        }
+
         // ── Testimonials ────────────────────────────────────────────
         $byTitle = Package::pluck('id', 'title');
         foreach ([

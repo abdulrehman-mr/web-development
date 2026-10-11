@@ -16,17 +16,13 @@ class SubmissionController extends Controller
         $request->validate(['package' => 'required|string|exists:packages,slug']);
         $package = Package::published()->where('slug', $request->input('package'))->firstOrFail();
 
-        $data = $request->validated();
-        $data['children'] ??= 0;
-
-        $booking = $package->bookings()->create($data + [
-            'total_estimate' => BookingController::estimate($package, $data['adults'], $data['children']),
-        ] + BookingController::currencySnapshot());
+        $booking = BookingController::createBooking($package, $request->validated());
 
         return response()->json(['data' => [
             'reference' => $booking->reference,
             'status' => $booking->status,
             'total_estimate' => (float) $booking->total_estimate,
+            'price_breakdown' => $booking->price_breakdown,
             'currency' => currencies()->base()->code,
         ]], 201);
     }
