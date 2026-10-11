@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use App\Support\EmailNotifier;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Support\Facades\DB;
@@ -53,10 +54,10 @@ class Payment extends Model
     /** Record a successful payment. Safe to call more than once (return page and webhook can both arrive). */
     public function markPaid(?string $gatewayReference = null, array $payload = []): void
     {
-        DB::transaction(function () use ($gatewayReference, $payload) {
+        $newlyPaid = DB::transaction(function () use ($gatewayReference, $payload) {
             $fresh = static::lockForUpdate()->find($this->id);
             if ($fresh->status === self::PAID) {
-                return;
+                return false;
             }
 
             $fresh->update([
@@ -68,7 +69,16 @@ class Payment extends Model
             ]);
             $fresh->booking->refreshPaymentStatus();
             $this->setRawAttributes($fresh->getAttributes(), true);
+
+            return true;
         });
+
+        if ($newlyPaid) {
+            $booking = $this->booking()->with('package')->first();
+            $notifier = app(EmailNotifier::class);
+            $notifier->forBooking('payment_received_guest', $booking, $this);
+            $notifier->forBooking('payment_received_admin', $booking, $this);
+        }
     }
 
     public function markFailed(string $reason, string $status = self::FAILED): void

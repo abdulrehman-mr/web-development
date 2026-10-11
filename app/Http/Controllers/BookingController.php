@@ -6,6 +6,7 @@ use App\Http\Requests\BookingRequest;
 use App\Models\Booking;
 use App\Models\Package;
 use App\Support\BookingPricing;
+use App\Support\EmailNotifier;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\View\View;
 
@@ -37,7 +38,7 @@ class BookingController extends Controller
             array_values(array_unique($data['extras'] ?? [])),
         );
 
-        return $package->bookings()->create([
+        $booking = $package->bookings()->create([
             'full_name' => $data['full_name'],
             'email' => $data['email'],
             'phone' => $data['phone'] ?? null,
@@ -52,6 +53,12 @@ class BookingController extends Controller
             'price_breakdown' => $quote['lines'],
             'total_estimate' => $quote['total'],
         ] + self::currencySnapshot());
+
+        $notifier = app(EmailNotifier::class);
+        $notifier->forBooking('booking_received_guest', $booking);
+        $notifier->forBooking('booking_received_admin', $booking);
+
+        return $booking;
     }
 
     /** The configurator page: travellers, room, extras and details with a live summary. */

@@ -18,6 +18,8 @@
         ['Currencies', 'admin.currencies.index', 'globe', 'admin.currencies.*'],
         ['Payments', 'admin.payments.edit', 'ticket', 'admin.payments.*'],
         ['Appearance', 'admin.appearance.edit', 'sparkle', 'admin.appearance.*'],
+        ['Email settings', 'admin.email.edit', 'mail', 'admin.email.*'],
+        ['Email templates', 'admin.email-templates.index', 'document', 'admin.email-templates.*'],
         ['Site content', 'admin.settings.edit', 'settings', 'admin.settings.*'],
     ];
     $pending = \App\Models\Booking::where('status', 'pending')->count();

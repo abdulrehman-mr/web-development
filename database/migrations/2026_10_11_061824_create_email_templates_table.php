@@ -1,0 +1,31 @@
+<?php
+
+use Database\Seeders\EmailTemplateSeeder;
+use Illuminate\Database\Migrations\Migration;
+use Illuminate\Database\Schema\Blueprint;
+use Illuminate\Support\Facades\Schema;
+
+return new class extends Migration
+{
+    public function up(): void
+    {
+        Schema::create('email_templates', function (Blueprint $table) {
+            $table->id();
+            $table->string('key')->unique();
+            $table->string('name');
+            $table->string('description')->nullable();
+            $table->string('audience', 10)->default('guest');
+            $table->string('subject');
+            $table->text('body');
+            $table->boolean('is_enabled')->default(true);
+            $table->timestamps();
+        });
+
+        (new EmailTemplateSeeder)->run();
+    }
+
+    public function down(): void
+    {
+        Schema::dropIfExists('email_templates');
+    }
+};

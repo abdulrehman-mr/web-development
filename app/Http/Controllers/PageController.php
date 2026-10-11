@@ -6,6 +6,7 @@ use App\Models\Faq;
 use App\Models\Hotel;
 use App\Models\Inquiry;
 use App\Models\Testimonial;
+use App\Support\EmailNotifier;
 use Illuminate\Http\Request;
 use Illuminate\Validation\Rule;
 
@@ -39,7 +40,7 @@ class PageController extends Controller
             return back()->with('status', 'Thank you — we will be in touch shortly.');
         }
 
-        Inquiry::create($request->validate([
+        $inquiry = Inquiry::create($request->validate([
             'name' => 'required|string|max:120',
             'email' => 'required|email|max:160',
             'phone' => 'nullable|string|max:40',
@@ -47,6 +48,9 @@ class PageController extends Controller
             'subject' => 'nullable|string|max:160',
             'message' => 'required|string|max:5000',
         ]));
+        $notifier = app(EmailNotifier::class);
+        $notifier->forInquiry('inquiry_received_admin', $inquiry);
+        $notifier->forInquiry('inquiry_autoreply_guest', $inquiry);
 
         return back()->with('status', 'Thank you — a travel designer will reply within one working day.');
     }

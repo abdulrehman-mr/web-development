@@ -46,6 +46,17 @@ Route::prefix('admin')->name('admin.')->middleware('auth')->group(function () {
     Route::resource('testimonials', Admin\TestimonialController::class)->except('show');
     Route::resource('faqs', Admin\FaqController::class)->except('show');
     Route::resource('bookings', Admin\BookingController::class)->only(['index', 'show', 'update', 'destroy']);
+    Route::post('bookings/{booking}/payment-link', [Admin\BookingController::class, 'sendPaymentLink'])->name('bookings.payment-link');
+    Route::get('email', [Admin\EmailSettingsController::class, 'edit'])->name('email.edit');
+    Route::put('email', [Admin\EmailSettingsController::class, 'update'])->name('email.update');
+    Route::post('email/test', [Admin\EmailSettingsController::class, 'test'])->name('email.test');
+    Route::get('email-templates', [Admin\EmailTemplateController::class, 'index'])->name('email-templates.index');
+    Route::get('email-templates/{template}/edit', [Admin\EmailTemplateController::class, 'edit'])->name('email-templates.edit');
+    Route::put('email-templates/{template}', [Admin\EmailTemplateController::class, 'update'])->name('email-templates.update');
+    Route::patch('email-templates/{template}/toggle', [Admin\EmailTemplateController::class, 'toggle'])->name('email-templates.toggle');
+    Route::post('email-templates/{template}/preview', [Admin\EmailTemplateController::class, 'preview'])->name('email-templates.preview');
+    Route::post('email-templates/{template}/test', [Admin\EmailTemplateController::class, 'test'])->name('email-templates.test');
+    Route::post('email-templates/{template}/reset', [Admin\EmailTemplateController::class, 'reset'])->name('email-templates.reset');
     Route::resource('inquiries', Admin\InquiryController::class)->only(['index', 'show', 'destroy']);
     Route::get('media', [Admin\MediaController::class, 'index'])->name('media.index');
     Route::post('media', [Admin\MediaController::class, 'store'])->name('media.store');

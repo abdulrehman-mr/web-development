@@ -7,6 +7,7 @@ use App\Http\Controllers\Controller;
 use App\Http\Requests\BookingRequest;
 use App\Models\Inquiry;
 use App\Models\Package;
+use App\Support\EmailNotifier;
 use Illuminate\Http\Request;
 
 class SubmissionController extends Controller
@@ -37,6 +38,9 @@ class SubmissionController extends Controller
             'subject' => 'nullable|string|max:160',
             'message' => 'required|string|max:5000',
         ]));
+        $notifier = app(EmailNotifier::class);
+        $notifier->forInquiry('inquiry_received_admin', $inquiry);
+        $notifier->forInquiry('inquiry_autoreply_guest', $inquiry);
 
         return response()->json(['data' => ['id' => $inquiry->id]], 201);
     }

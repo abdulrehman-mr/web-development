@@ -75,7 +75,7 @@
                 @php $link = \App\Http\Controllers\PaymentController::payLink($booking); @endphp
                 <div class="mt-4 flex flex-wrap gap-2">
                     <button type="button" class="btn btn-ghost py-2" @click="navigator.clipboard.writeText(@js($link)); copied = true; setTimeout(() => copied = false, 1500)"><x-icon name="external" class="size-4"/><span x-text="copied ? 'Link copied' : 'Copy payment link'">Copy payment link</span></button>
-                    <a href="mailto:{{ $booking->email }}?subject={{ rawurlencode('Payment for your journey ('.$booking->reference.')') }}&body={{ rawurlencode("Hello {$booking->full_name},\n\nYou can pay securely for your journey here:\n{$link}\n\nThank you!") }}" class="btn btn-ghost py-2"><x-icon name="mail" class="size-4"/>Email link to guest</a>
+                    <form method="post" action="{{ route('admin.bookings.payment-link', $booking) }}">@csrf<button class="btn btn-ghost py-2"><x-icon name="mail" class="size-4"/>Email payment link to guest</button></form>
                 </div>
                 <p class="mt-2 text-xs text-slate-500">The link is valid for 30 days.</p>
             </x-admin.card>

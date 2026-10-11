@@ -31,6 +31,12 @@ class PaymentController extends Controller
         return URL::temporarySignedRoute('bookings.pay', now()->addDays(30), $booking);
     }
 
+    /** Signed link to a booking's confirmation page, for emails. */
+    public static function bookingLink(Booking $booking): string
+    {
+        return URL::temporarySignedRoute('bookings.show', now()->addDays(90), $booking);
+    }
+
     public function show(Request $request, Booking $booking): View
     {
         abort_unless(self::canAccess($request, $booking), 404);
