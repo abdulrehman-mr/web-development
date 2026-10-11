@@ -24,7 +24,7 @@
             <x-admin.card title="Trip">
                 <dl class="grid gap-4 text-sm sm:grid-cols-3">
                     <div class="sm:col-span-3"><dt class="text-xs text-ink/50">Journey</dt><dd class="mt-0.5 font-medium">@if($booking->package)<a href="{{ route('admin.packages.edit', $booking->package) }}" class="text-brand-800 hover:underline">{{ $booking->package->title }}</a>@else — @endif</dd></div>
-                    <div><dt class="text-xs text-ink/50">Start date</dt><dd class="mt-0.5 font-medium">{{ $booking->start_date?->format('l, j F Y') }}</dd></div>
+                    <div><dt class="text-xs text-ink/50">Start date</dt><dd class="mt-0.5 font-medium">{{ $booking->start_date?->format('l, j F Y') }}@if ($booking->departure)<span class="ml-2 rounded-full bg-brand-50 px-2 py-0.5 text-xs font-semibold text-brand-800">Group departure{{ $booking->departure->label ? ': '.$booking->departure->label : '' }}</span>@endif</dd></div>
                     <div><dt class="text-xs text-ink/50">Travellers</dt><dd class="mt-0.5 font-medium">{{ $booking->adults }} adults, {{ $booking->children }} children</dd></div>
                     <div><dt class="text-xs text-ink/50">Room</dt><dd class="mt-0.5 font-medium">{{ $booking->room_preference ?: '—' }}</dd></div>
                 </dl>

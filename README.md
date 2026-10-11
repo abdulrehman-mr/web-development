@@ -71,6 +71,21 @@ The section types are:
 
 The section editor shows a live preview of the page at desktop or phone width, refreshed each time you save. Uploaded videos must fit your server's PHP upload limit (`upload_max_filesize` and `post_max_size`).
 
+## Itinerary activities and departures
+
+**Activities:** each itinerary day can list timed activities, such as "Morning · 10 am, Badshahi Mosque". Each activity has a description and a photo, which you can upload or give as a URL. They show as a timeline inside the day on the journey page.
+
+**Dates & departures** (journey editor) sets how guests choose dates:
+- **Any date:** guests pick their own start date.
+- **Fixed departures:** guests join one of your batches.
+- **Both:** batches, or a private trip on their own date.
+
+Each departure has a start date, a seat limit (optional), a price change per person (+ or −), a name such as "Gurpurab batch", and can be closed.
+- **Add recurring departures** creates dates every day, week, 2 weeks or month, from a first date until an end date or a number of departures.
+- Seats left count every booking that isn't cancelled. A full departure shows "Sold out" and can't be booked; the booking is checked on the server.
+- A removed departure that already has bookings is closed instead of deleted.
+- If a "fixed departures" journey has no upcoming dates, guests can still request their own date.
+
 ## Content packs, countries and vibes
 
 **Admin → Content packs** adds a whole country in one click: destinations, hotels and complete journeys with itineraries, prices, group prices, room and hotel choices, extras and vibes. Packs are available for India, Maldives, Saudi Arabia (Umrah & Hajj), Thailand, South Korea, France, United Kingdom, USA & Niagara Falls, Turkey, Azerbaijan and China.

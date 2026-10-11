@@ -24,7 +24,8 @@ class BookingRequest extends FormRequest
             'country' => ['nullable', 'string', Rule::in(array_values(config('countries')))],
             'adults' => 'required|integer|min:1|max:40',
             'children' => 'nullable|integer|min:0|max:40',
-            'start_date' => 'required|date|after:today',
+            'departure_id' => 'nullable|integer',
+            'start_date' => 'required_without:departure_id|nullable|date|after:today',
             'room_type_id' => 'nullable|integer',
             'extras' => 'nullable|array',
             'extras.*' => 'string|max:10',
@@ -39,6 +40,9 @@ class BookingRequest extends FormRequest
      */
     public function messages(): array
     {
-        return ['country.in' => 'Please choose your country from the list.'];
+        return [
+            'country.in' => 'Please choose your country from the list.',
+            'start_date.required_without' => 'Please choose a start date or one of the departures.',
+        ];
     }
 }

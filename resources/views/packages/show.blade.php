@@ -91,6 +91,24 @@
                                     <div x-show="open.includes({{ $loop->index }})" x-collapse @if(! $loop->first) x-cloak @endif>
                                         <div class="border-t border-slate-200 px-5 pt-4 pb-5">
                                             <p class="leading-relaxed text-ink/75">{{ $day->description }}</p>
+                                            @if ($day->activities)
+                                                <ol class="mt-5 space-y-3">
+                                                    @foreach ($day->activities as $activity)
+                                                        <li class="flex gap-4 rounded-2xl bg-slate-50 p-3 ring-1 ring-slate-200 sm:p-4">
+                                                            <div class="min-w-0 flex-1">
+                                                                @if ($activity['time'])
+                                                                    <p class="inline-flex items-center gap-1.5 rounded-full bg-white px-2.5 py-1 text-xs font-semibold text-brand-700 ring-1 ring-slate-200"><x-icon name="clock" class="size-3.5"/>{{ $activity['time'] }}</p>
+                                                                @endif
+                                                                <p class="mt-2 font-semibold text-slate-900">{{ $activity['title'] }}</p>
+                                                                @if ($activity['description'])<p class="mt-1 text-sm leading-relaxed text-ink/70">{{ $activity['description'] }}</p>@endif
+                                                            </div>
+                                                            @if ($activity['image'])
+                                                                <x-media :src="media_url($activity['image'])" :alt="$activity['title']" class="aspect-[4/3] w-28 shrink-0 self-start rounded-xl sm:w-40"/>
+                                                            @endif
+                                                        </li>
+                                                    @endforeach
+                                                </ol>
+                                            @endif
                                             <div class="mt-4 flex flex-wrap gap-2 text-xs">
                                                 @if ($day->hotel)
                                                     <span class="inline-flex items-center gap-1.5 rounded-full bg-brand-50 px-3 py-1.5 font-medium text-brand-800"><x-icon name="bed" class="size-4"/>{{ $day->hotel->name }}</span>
@@ -202,6 +220,28 @@
                         <div class="flex justify-between gap-4"><dt class="text-slate-500">Group of {{ $tier['min'] }}+</dt><dd class="font-semibold text-brand-700">{{ money($tier['price']) }} per adult</dd></div>
                     @endforeach
                 </dl>
+
+                @php $departures = $pricing->departures($package)->take(4); @endphp
+                @if ($departures->isNotEmpty())
+                    <div class="mt-5 border-t border-slate-100 pt-4">
+                        <p class="text-sm font-semibold text-slate-900">Next departures</p>
+                        <ul class="mt-2 space-y-1.5">
+                            @foreach ($departures as $d)
+                                <li>
+                                    <a href="{{ $d['seatsLeft'] === 0 ? '#' : route('packages.book', [$package, 'departure' => $d['id']]) }}" @class(['flex items-center justify-between gap-3 rounded-xl px-3 py-2 text-sm ring-1 transition', $d['seatsLeft'] === 0 ? 'pointer-events-none bg-slate-50 text-slate-400 ring-slate-100' : 'ring-slate-200 hover:bg-brand-50 hover:ring-brand-300'])>
+                                        <span class="min-w-0">
+                                            <span class="block font-medium text-slate-900">{{ $d['range'] }}</span>
+                                            @if ($d['label'])<span class="block truncate text-xs text-slate-500">{{ $d['label'] }}</span>@endif
+                                        </span>
+                                        <span @class(['shrink-0 text-xs font-semibold', $d['seatsLeft'] === 0 ? 'text-slate-400' : ($d['seatsLeft'] !== null && $d['seatsLeft'] <= 4 ? 'text-amber-700' : 'text-brand-700')])>
+                                            {{ $d['seatsLeft'] === 0 ? 'Sold out' : ($d['seatsLeft'] === null ? 'Open' : $d['seatsLeft'].' '.Str::plural('seat', $d['seatsLeft']).' left') }}
+                                        </span>
+                                    </a>
+                                </li>
+                            @endforeach
+                        </ul>
+                    </div>
+                @endif
 
                 @if ($rooms->isNotEmpty())
                     <div class="mt-4 border-t border-slate-100 pt-4">

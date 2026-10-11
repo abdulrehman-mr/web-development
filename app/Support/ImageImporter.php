@@ -5,6 +5,7 @@ namespace App\Support;
 use App\Models\Category;
 use App\Models\Destination;
 use App\Models\Hotel;
+use App\Models\ItineraryDay;
 use App\Models\MediaAsset;
 use App\Models\Package;
 use App\Models\Setting;
@@ -75,6 +76,13 @@ class ImageImporter
         foreach (app(PageBuilder::class)->imageFields() as [$section, $path]) {
             if (MediaAsset::isImportable($value = data_get($section->data, $path))) {
                 MediaAsset::register($value);
+            }
+        }
+        foreach (ItineraryDay::whereNotNull('activities')->get() as $day) {
+            foreach ($day->activities as $activity) {
+                if (MediaAsset::isImportable($activity['image'] ?? null)) {
+                    MediaAsset::register($activity['image']);
+                }
             }
         }
 
@@ -194,6 +202,14 @@ class ImageImporter
         if ($settings) {
             Setting::put($settings);
             $changed += count($settings);
+        }
+
+        foreach (ItineraryDay::whereNotNull('activities')->get() as $day) {
+            $activities = array_map(fn ($a) => array_replace($a, ['image' => $map[$a['image'] ?? ''] ?? ($a['image'] ?? null)]), $day->activities);
+            if ($activities !== $day->activities) {
+                $day->forceFill(['activities' => $activities])->saveQuietly();
+                $changed++;
+            }
         }
 
         foreach (app(PageBuilder::class)->imageFields() as [$section, $path]) {

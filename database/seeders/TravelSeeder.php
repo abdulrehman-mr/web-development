@@ -212,6 +212,19 @@ class TravelSeeder extends Seeder
             ],
         ];
 
+        // Sample timed activities for a few days; the rest of the itinerary uses descriptions only.
+        $activities = [
+            'Gurdwara Dera Sahib & the Walled City' => [
+                ['time' => 'Morning · 9 am', 'title' => 'Gurdwara Dera Sahib', 'description' => 'Ardas and kirtan where Guru Arjan Dev Ji attained martyrdom, then the Samadhi of Maharaja Ranjit Singh next door.', 'image' => 'wiki:Gurdwara Dera Sahib'],
+                ['time' => 'Noon · 1 pm', 'title' => 'Lahore Fort', 'description' => 'The Sheesh Mahal, the Picture Wall and the Alamgiri Gate, with a licensed guide.', 'image' => 'wiki:Lahore Fort'],
+                ['time' => 'Evening · 5 pm', 'title' => 'Badshahi Mosque at sunset', 'description' => 'One of the largest Mughal mosques, glowing red as the sun goes down.', 'image' => 'wiki:Badshahi Mosque'],
+            ],
+            'To Nankana Sahib' => [
+                ['time' => 'Morning · 9 am', 'title' => 'Drive to Nankana Sahib', 'description' => 'About two hours through Punjab farmland.', 'image' => null],
+                ['time' => 'Evening · 6 pm', 'title' => 'Gurdwara Janam Asthan', 'description' => 'Evening ardas at the birthplace of Guru Nanak Dev Ji.', 'image' => 'wiki:Gurdwara Janam Asthan'],
+            ],
+        ];
+
         foreach ($packages as $i => $p) {
             $package = Package::create([
                 'category_id' => $categories[$p['category']]->id,
@@ -232,6 +245,7 @@ class TravelSeeder extends Seeder
                 $package->days()->create([
                     'day_number' => $n + 1, 'title' => $title, 'description' => $description,
                     'hotel_id' => $hotel ? $hotels[$hotel]->id : null, 'meals' => $meals,
+                    'activities' => $activities[$title] ?? null,
                 ]);
             }
         }

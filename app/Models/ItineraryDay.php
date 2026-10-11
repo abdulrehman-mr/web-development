@@ -7,7 +7,12 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
 class ItineraryDay extends Model
 {
-    protected $fillable = ['package_id', 'hotel_id', 'day_number', 'title', 'description', 'meals'];
+    protected $fillable = ['package_id', 'hotel_id', 'day_number', 'title', 'description', 'meals', 'activities'];
+
+    protected function casts(): array
+    {
+        return ['activities' => 'array'];
+    }
 
     public function package(): BelongsTo
     {

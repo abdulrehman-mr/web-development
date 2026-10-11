@@ -74,6 +74,7 @@ class CatalogController extends Controller
                 'description' => $day->description,
                 'meals' => $day->meals,
                 'stay' => $day->hotel ? $this->hotelData($day->hotel) : null,
+                'activities' => collect($day->activities ?? [])->map(fn ($a) => ['image' => media_url($a['image'])] + $a)->values(),
             ]),
         ]];
     }

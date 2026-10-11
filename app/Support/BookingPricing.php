@@ -2,6 +2,7 @@
 
 namespace App\Support;
 
+use App\Models\Departure;
 use App\Models\Hotel;
 use App\Models\Package;
 use App\Models\RoomType;
@@ -133,7 +134,30 @@ class BookingPricing
             'rooms' => $this->rooms($package)->all(),
             'extras' => $this->extras($package)->all(),
             'groups' => $this->groups($package)->all(),
+            'dateMode' => $package->date_mode,
+            'departures' => $this->departures($package)->all(),
         ];
+    }
+
+    /**
+     * Upcoming departures ("batches") a guest can pick, with seats left.
+     *
+     * @return Collection<int, array{id: int, date: string, range: string, label: ?string, adjustment: float, seatsLeft: ?int}>
+     */
+    public function departures(Package $package): Collection
+    {
+        if (! $package->usesDepartures()) {
+            return collect();
+        }
+
+        return $package->departures()->upcoming()->get()->map(fn (Departure $d) => [
+            'id' => $d->id,
+            'date' => $d->starts_on->toDateString(),
+            'range' => $d->setRelation('package', $package)->dateRange(),
+            'label' => $d->label,
+            'adjustment' => round((float) $d->price_adjustment, 2),
+            'seatsLeft' => $d->seatsLeft(),
+        ]);
     }
 
     /**
@@ -143,7 +167,7 @@ class BookingPricing
      *
      * @throws ValidationException when the room, an extra or an option is not offered for this journey
      */
-    public function quote(Package $package, int $adults, int $children, ?int $roomTypeId, array $extraKeys = [], array $optionKeys = []): array
+    public function quote(Package $package, int $adults, int $children, ?int $roomTypeId, array $extraKeys = [], array $optionKeys = [], ?Departure $departure = null): array
     {
         $travellers = $adults + $children;
         $adultPrice = $this->adultPrice($package, $travellers);
@@ -165,6 +189,9 @@ class BookingPricing
         $lines = [['label' => $adults.' × adult'.($adultPrice < (float) $package->price ? ' (group price)' : ''), 'amount' => $adults * $adultPrice]];
         if ($children > 0) {
             $lines[] = ['label' => $children.' × child', 'amount' => $children * $childPrice];
+        }
+        if ($departure && $departure->price_adjustment != 0) {
+            $lines[] = ['label' => 'Departure '.$departure->starts_on->format('j M Y').($departure->label ? ' ('.$departure->label.')' : '').' × '.$travellers, 'amount' => $travellers * (float) $departure->price_adjustment];
         }
         if ($room && $room['adjustment'] != 0) {
             $lines[] = ['label' => $room['name'].' × '.$adults.' adult'.($adults > 1 ? 's' : ''), 'amount' => $adults * $room['adjustment']];

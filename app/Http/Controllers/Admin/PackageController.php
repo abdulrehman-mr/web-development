@@ -11,6 +11,7 @@ use App\Models\Package;
 use App\Models\RoomType;
 use App\Models\Vibe;
 use Illuminate\Http\Request;
+use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Validation\Rule;
 
@@ -99,6 +100,20 @@ class PackageController extends Controller
             'days.*.description' => 'nullable|string',
             'days.*.meals' => 'nullable|string|max:100',
             'days.*.hotel_id' => 'nullable|exists:hotels,id',
+            'date_mode' => 'nullable|in:any,departures,both',
+            'departures' => 'nullable|array|max:400',
+            'departures.*.id' => 'nullable|integer',
+            'departures.*.starts_on' => 'required|date',
+            'departures.*.seats' => 'nullable|integer|min:1|max:10000',
+            'departures.*.price_adjustment' => 'nullable|numeric|min:-1000000|max:1000000',
+            'departures.*.label' => 'nullable|string|max:120',
+            'departures.*.is_closed' => 'nullable|boolean',
+            'days.*.activities' => 'nullable|array|max:12',
+            'days.*.activities.*.time' => 'nullable|string|max:40',
+            'days.*.activities.*.title' => 'nullable|string|max:200',
+            'days.*.activities.*.description' => 'nullable|string|max:2000',
+            'days.*.activities.*.image' => 'nullable|string|max:2048',
+            'days.*.activities.*.image_file' => 'nullable|image|max:8192',
             'child_price' => 'nullable|numeric|min:0',
             'tiers' => 'nullable|array',
             'tiers.*.min' => 'required|integer|min:2|max:200|distinct',
@@ -139,6 +154,7 @@ class PackageController extends Controller
             'summary' => $data['summary'] ?? null,
             'overview' => $data['overview'] ?? null,
             'duration_days' => $data['duration_days'],
+            'date_mode' => $data['date_mode'] ?? 'any',
             'price' => $data['price'],
             'original_price' => $data['original_price'] ?? null,
             'group_size' => $data['group_size'] ?? null,
@@ -178,6 +194,8 @@ class PackageController extends Controller
         $package->destinations()->sync($data['destination_ids'] ?? []);
         $package->vibes()->sync($data['vibe_ids'] ?? []);
 
+        $this->syncDepartures($package, $data['departures'] ?? []);
+
         $package->days()->delete();
         foreach (array_values($data['days'] ?? []) as $i => $day) {
             $package->days()->create([
@@ -186,9 +204,61 @@ class PackageController extends Controller
                 'description' => $day['description'] ?? null,
                 'meals' => $day['meals'] ?? null,
                 'hotel_id' => $day['hotel_id'] ?? null,
+                'activities' => $this->activities($day['activities'] ?? []) ?: null,
             ]);
         }
 
         return $package;
+    }
+
+    /**
+     * A day's timed activities. A photo can be uploaded or given as a URL; empty rows are dropped.
+     *
+     * @param  array<int, array<string, mixed>>  $rows
+     * @return list<array{time: ?string, title: string, description: ?string, image: ?string}>
+     */
+    private function activities(array $rows): array
+    {
+        return collect($rows)->map(function (array $row) {
+            $image = ($row['image_file'] ?? null) instanceof UploadedFile
+                ? $row['image_file']->store('uploads', 'public')
+                : (filled($row['image'] ?? null) ? $row['image'] : null);
+            if ($image && MediaAsset::isImportable($image)) {
+                MediaAsset::register($image);
+            }
+
+            return [
+                'time' => filled($row['time'] ?? null) ? $row['time'] : null,
+                'title' => (string) ($row['title'] ?? ''),
+                'description' => filled($row['description'] ?? null) ? $row['description'] : null,
+                'image' => $image,
+            ];
+        })->filter(fn ($a) => $a['title'] !== '' || $a['image'])->values()->all();
+    }
+
+    /**
+     * Save the departure list. A removed departure that already has bookings is closed instead of deleted.
+     *
+     * @param  array<int, array<string, mixed>>  $rows
+     */
+    private function syncDepartures(Package $package, array $rows): void
+    {
+        $kept = [];
+        foreach ($rows as $row) {
+            $values = [
+                'starts_on' => $row['starts_on'],
+                'seats' => filled($row['seats'] ?? null) ? (int) $row['seats'] : null,
+                'price_adjustment' => (float) ($row['price_adjustment'] ?? 0),
+                'label' => filled($row['label'] ?? null) ? $row['label'] : null,
+                'is_closed' => (bool) ($row['is_closed'] ?? false),
+            ];
+            $departure = filled($row['id'] ?? null) ? $package->departures()->find($row['id']) : null;
+            $departure ? $departure->update($values) : $departure = $package->departures()->create($values);
+            $kept[] = $departure->id;
+        }
+
+        foreach ($package->departures()->whereNotIn('id', $kept)->withCount('bookings')->get() as $removed) {
+            $removed->bookings_count > 0 ? $removed->update(['is_closed' => true]) : $removed->delete();
+        }
     }
 }

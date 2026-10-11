@@ -98,6 +98,10 @@ Alpine.data('bookingConfigurator', (pricing, currency, initial) => ({
     roomId: initial.roomId ?? pricing.rooms.find((r) => r.default)?.id ?? null,
     chosenExtras: initial.extras,
     chosenOptions: Object.fromEntries(pricing.groups.map((g) => [g.key, initial.options?.[g.key] ?? g.options[0].key])),
+    // '' = the guest's own date (when allowed); otherwise a departure id.
+    departureId: initial.departureId ?? (pricing.dateMode === 'departures' ? String(pricing.departures.find((d) => d.seatsLeft !== 0)?.id ?? '') : ''),
+    get departure() { return this.departures.find((d) => String(d.id) === String(this.departureId)) ?? null },
+    seatsFor(d) { return d.seatsLeft === null ? null : d.seatsLeft },
     get travellers() { return this.adults + this.children },
     adultPriceFor(travellers) {
         const tier = this.tiers.filter((t) => travellers >= t.min).pop();
@@ -111,6 +115,9 @@ Alpine.data('bookingConfigurator', (pricing, currency, initial) => ({
     get lines() {
         const lines = [{ label: `${this.adults} × adult${this.groupPrice ? ' (group price)' : ''}`, amount: this.adults * this.adultUnit }];
         if (this.children > 0) lines.push({ label: `${this.children} × child`, amount: this.children * this.childUnit });
+        if (this.departure && this.departure.adjustment !== 0) {
+            lines.push({ label: `Departure ${this.departure.range}${this.departure.label ? ` (${this.departure.label})` : ''} × ${this.travellers}`, amount: this.travellers * this.departure.adjustment });
+        }
         if (this.room && this.room.adjustment !== 0) {
             lines.push({ label: `${this.room.name} × ${this.adults} adult${this.adults > 1 ? 's' : ''}`, amount: this.adults * this.room.adjustment });
         }

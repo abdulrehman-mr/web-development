@@ -14,7 +14,7 @@ class Booking extends Model
     protected $attributes = ['status' => 'pending', 'children' => 0, 'payment_status' => 'unpaid', 'amount_paid' => 0, 'exchange_rate' => 1];
 
     protected $fillable = [
-        'reference', 'package_id', 'full_name', 'email', 'phone', 'country', 'adults', 'children',
+        'reference', 'package_id', 'departure_id', 'full_name', 'email', 'phone', 'country', 'adults', 'children',
         'start_date', 'room_preference', 'special_requests', 'total_estimate', 'status', 'admin_notes',
         'currency', 'exchange_rate', 'amount_paid', 'payment_status', 'room_type_id', 'extras', 'options', 'price_breakdown',
     ];
@@ -43,6 +43,11 @@ class Booking extends Model
     public function payments(): HasMany
     {
         return $this->hasMany(Payment::class)->latest();
+    }
+
+    public function departure(): BelongsTo
+    {
+        return $this->belongsTo(Departure::class);
     }
 
     public function package(): BelongsTo

@@ -14,7 +14,9 @@
         'roomId' => old('room_type_id') ? (int) old('room_type_id') : null,
         'extras' => array_values((array) old('extras', [])),
         'options' => (object) old('options', []),
+        'departureId' => old('departure_id', request('departure')) !== null ? (string) old('departure_id', request('departure')) : null,
     ];
+    $hasDepartures = ! empty($pricing['departures']);
     $perLabel = ['adult' => 'per adult', 'person' => 'per person', 'booking' => 'per booking'];
 @endphp
 <x-site-layout :title="'Book '.$package->title">
@@ -37,11 +39,49 @@
                     {{-- 1. Date --}}
                     <section>
                         <h2 class="flex items-center gap-3 text-lg font-bold text-slate-900"><span class="grid size-7 place-items-center rounded-full bg-brand-700 text-sm text-white">1</span>When would you like to start?</h2>
-                        <div class="mt-4 max-w-xs">
-                            <label for="start_date" class="label">Start date</label>
-                            <input type="date" id="start_date" name="start_date" value="{{ old('start_date') }}" min="{{ now()->addDay()->toDateString() }}" required class="field">
-                            <p class="mt-1 text-xs text-slate-500">Best season: {{ $package->best_season ?: 'year-round' }}. Dates are flexible — we’ll confirm with you.</p>
-                        </div>
+                        @if ($hasDepartures)
+                            <p class="mt-2 text-sm text-slate-600">Join one of our group departures{{ $package->date_mode === 'both' ? ', or pick your own date for a private trip' : '' }}.</p>
+                            <div class="mt-4 grid gap-3 sm:grid-cols-2">
+                                @foreach ($pricing['departures'] as $d)
+                                    @php $full = $d['seatsLeft'] === 0; @endphp
+                                    <label @class(['relative flex cursor-pointer flex-col gap-1 rounded-2xl p-4 ring-1 transition has-checked:bg-brand-50 has-checked:ring-2 has-checked:ring-brand-600', $full ? 'cursor-not-allowed bg-slate-50 opacity-60 ring-slate-200' : 'bg-white ring-slate-200 hover:ring-slate-400'])>
+                                        <input type="radio" name="departure_id" value="{{ $d['id'] }}" x-model="departureId" @disabled($full) class="sr-only">
+                                        <span class="flex items-start justify-between gap-2">
+                                            <span class="font-semibold text-slate-900">{{ $d['range'] }}</span>
+                                            <x-icon name="check" class="size-5 shrink-0 text-brand-700 opacity-0 [label:has(:checked)_&]:opacity-100"/>
+                                        </span>
+                                        @if ($d['label'])<span class="text-sm text-slate-600">{{ $d['label'] }}</span>@endif
+                                        <span class="mt-1 flex flex-wrap items-center gap-2 text-xs">
+                                            @if ($full)
+                                                <span class="rounded-full bg-slate-200 px-2 py-0.5 font-semibold text-slate-600">Sold out</span>
+                                            @elseif ($d['seatsLeft'] !== null)
+                                                <span @class(['rounded-full px-2 py-0.5 font-semibold', $d['seatsLeft'] <= 4 ? 'bg-amber-100 text-amber-800' : 'bg-brand-50 text-brand-800'])>{{ $d['seatsLeft'] }} {{ Str::plural('seat', $d['seatsLeft']) }} left</span>
+                                            @else
+                                                <span class="rounded-full bg-brand-50 px-2 py-0.5 font-semibold text-brand-800">Open</span>
+                                            @endif
+                                            @if ($d['adjustment'] != 0)
+                                                <span class="font-medium text-slate-600" x-text="money({{ $d['adjustment'] }}, true) + ' per person'"></span>
+                                            @endif
+                                        </span>
+                                    </label>
+                                @endforeach
+                                @if ($package->date_mode === 'both')
+                                    <label class="flex cursor-pointer flex-col justify-center gap-1 rounded-2xl border-2 border-dashed border-slate-300 bg-white p-4 transition has-checked:border-solid has-checked:border-brand-600 has-checked:bg-brand-50">
+                                        <input type="radio" name="departure_id" value="" x-model="departureId" class="sr-only">
+                                        <span class="font-semibold text-slate-900">My own dates</span>
+                                        <span class="text-sm text-slate-600">A private trip on the day you choose</span>
+                                    </label>
+                                @endif
+                            </div>
+                            @error('departure_id')<p class="mt-2 text-sm text-rose-600">{{ $message }}</p>@enderror
+                        @endif
+                        @if (! $hasDepartures || $package->date_mode === 'both')
+                            <div class="mt-4 max-w-xs" @if ($hasDepartures) x-show="departureId === ''" x-cloak @endif>
+                                <label for="start_date" class="label">Start date</label>
+                                <input type="date" id="start_date" name="start_date" value="{{ old('start_date') }}" min="{{ now()->addDay()->toDateString() }}" @if ($hasDepartures) :required="departureId === ''" :disabled="departureId !== ''" @else required @endif class="field">
+                                <p class="mt-1 text-xs text-slate-500">Best season: {{ $package->best_season ?: 'year-round' }}. Dates are flexible — we’ll confirm with you.</p>
+                            </div>
+                        @endif
                     </section>
 
                     {{-- 2. Travellers --}}
